@@ -19,6 +19,7 @@ import UserSettings from '@pages/user/UserSettings.tsx';
 
 import UserProfileSubPage from './pages/user/UserProfileSubPage.tsx';
 import UserAccountSubPage from '@pages/user/UserAccountSubPage.tsx';
+import UserEmailVerificationPage from '@pages/user/UserEmailVerificationPage.tsx';
 
 const queryClient = new QueryClient();
 
@@ -28,7 +29,8 @@ const router = createBrowserRouter(
             <Route index={true} path='/' element={<HomePage />} />
             <Route path='/login' element={<UserLoginPage />} />
             <Route path='/register' element={<UserRegistrationPage />} />
-
+            <Route path="/verify/:code" element={<UserEmailVerificationPage />} />
+            
             {/* Private Routes */}
             <Route path='' element={<PrivateRoute />}>
                 <Route path="/user" element={<UserSettings />}>
