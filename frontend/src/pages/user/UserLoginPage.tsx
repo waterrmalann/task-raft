@@ -1,11 +1,42 @@
 import { LoginForm } from '@components/forms/LoginForm.tsx';
 
 import { buttonVariants } from "@/components/ui/button"
+import AuthSideHalf from "@components/AuthSideHalf";
 
 import { cn } from "@/lib/utils"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
+import React, { useEffect, useState } from 'react';
+import { OTPForm } from '@components/forms/OTPForm';
+
+// import PasswordResetForm from '@components/forms/PasswordResetForm';
+
+export interface UserCredentials {
+    username: string;
+    password: string;
+}
 
 export default function UserLoginPage() {
+    const navigate = useNavigate();
+
+    const [getCredentials, setCredentials] = useState<UserCredentials>({username: '', password: ''});
+    const [getMFA, setMFA] = useState(false);
+    // const [passwordReset, setPasswordReset] = useState(false);
+
+    // State that determines if we are finally A-Ok for login.
+    const [ok, setOk] = useState(false);
+    useEffect(() => {
+        if (ok) {
+            // Invalidate any leftover credentials for security.
+            setCredentials({username: '', password: ''})
+            // Redirect to dashboard now that  we are logged in.
+            navigate('/dash', {replace: true});
+        }
+    }, [ok, navigate]);
+
+    function handlePasswordReset() {
+        // setPasswordReset(true);
+    }
+
     return (
         <>
             <div className="container relative hidden h-screen flex-col items-center justify-center sm:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
@@ -18,52 +49,39 @@ export default function UserLoginPage() {
                 >
                     Register
                 </Link>
-                <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
-                    <div className="absolute inset-0 bg-zinc-900" />
-                    <div className="relative z-20 flex items-center text-lg font-medium">
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="mr-2 h-6 w-6"
-                        >
-                            <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
-                        </svg>
-                        TaskRaft
-                    </div>
-                    <div className="relative z-20 mt-auto">
-                        <blockquote className="space-y-2">
-                            <p className="text-lg">
-                                &ldquo;Time isn’t the main thing, it is the only thing.&rdquo;
-                            </p>
-                            <footer className="text-sm">Miles Davis</footer>
-                        </blockquote>
-                    </div>
-                </div>
+                <AuthSideHalf />
                 <div className="lg:p-8">
+
                     <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
                         <div className="flex flex-col space-y-2 text-center">
                             <h1 className="text-2xl font-semibold tracking-tight">
-                                Login to your account
+                                {getMFA ? '2 Factor Authentication' : 'Login to your account'}
                             </h1>
                             <p className="text-sm text-muted-foreground">
-                                Enter your email and password below to login.
+                                {getMFA ? 'Enter your email OTP to login.' : 'Enter your email and password below to login.'}
                             </p>
                         </div>
-                        <LoginForm />
-                        <p className="px-8 text-center text-sm text-muted-foreground">
-                            <Link
-                                to="/forgot"
-                                className="underline underline-offset-4 hover:text-primary"
-                            >
-                                I forgot my password.
-                            </Link>
-                            .
-                        </p>
+                        {
+                            getMFA ? (
+                                <React.Fragment>
+                                    <OTPForm setOk={setOk} getCredentials={getCredentials} />
+                                </React.Fragment>
+                            ) : (
+                                <React.Fragment>
+                                    <LoginForm setOk={setOk} setCredentials={setCredentials} setMFA={setMFA} />
+                                    <p className="px-8 text-center text-sm text-muted-foreground">
+                                        <span
+                                            onClick={handlePasswordReset}
+                                            className="underline underline-offset-4 hover:text-primary cursor-pointer"
+                                        >
+                                            I forgot my password.
+                                        </span>
+                                        .
+                                    </p>
+                                </React.Fragment>
+                            )
+                        }
+
                     </div>
                 </div>
             </div>
