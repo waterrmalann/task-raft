@@ -1,8 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { API_ROUTES } from '@constants/routes';
-import { useNavigate } from 'react-router-dom';
 
-interface SuccessResponse {
+/**
+ * Response from a successful login.
+ */
+export interface SuccessResponse {
     success: true;
     user: {
         _id: string;
@@ -17,24 +19,36 @@ interface SuccessResponse {
     };
 }
 
+/**
+ * Response from a failed login attempt.
+ */
 interface ErrorResponse {
     success: false;
     message: string;
 }
 
-type LoginResponse = SuccessResponse | ErrorResponse;
+/** 
+ * The possible responses from a login attempt. 
+ */
+export type LoginResponse = SuccessResponse | ErrorResponse;
 
+/** Parameters required for the login operation. */
 interface LoginParams {
     username: string;
     password: string;
 }
 
+/**
+ * A custom hook for handling user login.
+ * 
+ * @returns An object containing the loginMutation function that triggers the login process.
+ */
 const useLogin = () => {
-    const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const loginMutation = useMutation<SuccessResponse["user"], Error, LoginParams>(
+    const loginMutation = useMutation<SuccessResponse, Error, LoginParams>(
         async ({ username, password }) => {
+
             const response = await fetch(API_ROUTES.POST_LOGIN_USER, {
                 method: 'POST',
                 headers: {
@@ -47,13 +61,16 @@ const useLogin = () => {
             if (!data.success) {
                 throw new Error(data.message);
             } else {
-                return data.user;
+                return data;
             }
         },
         {
             onSuccess: (user) => {
-                queryClient.setQueryData(['user'], user);
-                navigate('/dash', {replace: true});
+                // If the user has MFA, we shouldn't cache the data too early as they haven't authenticated fully.
+                if (!user.user.preferences.mfa) {
+                    // Update user data in the cache
+                    queryClient.setQueryData(['user'], user.user);
+                }
             }
         }
     );
