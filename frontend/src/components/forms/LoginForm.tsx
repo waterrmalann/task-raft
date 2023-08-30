@@ -10,10 +10,18 @@ import { Label } from "@components/ui/label"
 import { Input } from "@components/ui/input"
 import useLogin from "@hooks/user/useLogin";
 
-interface LoginFormProps extends React.HTMLAttributes<HTMLDivElement> { }
+import { UserCredentials } from "@pages/user/UserLoginPage";
 
-export function LoginForm({ className, ...props }: LoginFormProps) {
-    
+//  Redirect to the dashboard on successful login
+//  navigate('/dash', { replace: true });
+
+interface LoginFormProps extends React.HTMLAttributes<HTMLDivElement> { 
+    setCredentials: React.Dispatch<React.SetStateAction<UserCredentials>>;
+    setMFA: React.Dispatch<React.SetStateAction<boolean>>;
+    setOk: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export function LoginForm({ className, setCredentials, setMFA, setOk, ...props }: LoginFormProps) {
     const loginQuery = useLogin();
     
     const usernameRef = useRef<HTMLInputElement | null>(null);
@@ -27,7 +35,19 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
         const password = passwordRef.current?.value;
 
         if (username && password) {
-            loginQuery.mutate({ username, password });
+            try {
+                const response = await loginQuery.mutateAsync({ username, password });
+                if (response.success) {
+                    if (response.user.preferences.mfa) {
+                        setCredentials({username, password});
+                        setMFA(response.user.preferences.mfa);
+                    } else {
+                        setOk(true);
+                    }
+                }
+            } catch (error) {
+                console.error(error);
+            }
         }
     }
 

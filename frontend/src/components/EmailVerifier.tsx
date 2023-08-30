@@ -23,16 +23,16 @@ export const EmailVerifier = () => {
     }
 
     if (isError) {
-        return <p>Error verifying email</p>;
+        return <p className="px-8 text-center text-sm text-red-500">Error verifying email</p>;
     }
 
     if (!data.success) {
-        return <p>{data.message}</p>
+        return <p className="px-8 text-center text-sm text-red-500">{data.message}</p>
     }
 
     return (
         <div>
-            <h2>Your account has been successfully verified!</h2>
+            <h2 className="px-8 py-2 text-xl text-center">Your account has been successfully verified!</h2>
             <p className="px-8 text-center text-sm text-muted-foreground">Login to your{" "}
                 <Link
                     to="/login"

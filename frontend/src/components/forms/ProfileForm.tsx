@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input"
 
 // import { Textarea } from "@/components/ui/textarea"
 import useUser from "@hooks/user/useUser"
-import { useEditUserMutation } from "@hooks/user/useEditUserMutation"
+import useEditUserMutation from "@hooks/user/useEditUserMutation"
 // import { toast } from "@/components/ui/use-toast"
 
 const profileFormSchema = z.object({
