@@ -4,7 +4,7 @@ export const API_ROUTES = {
     POST_LOGIN_USER: '/api/user/login',
     POST_LOGOUT_USER: '/api/user/logout',
 
-    POST_LOGIN_USER_MFA: '/api/user/mfa',
+    POST_LOGIN_USER_MFA: '/api/user/login',
     POST_VERIFY_EMAIL: '/api/user/verify/',
 
     /* PROFILE ROUTES */
