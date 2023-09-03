@@ -3,6 +3,11 @@ import { useQuery } from '@tanstack/react-query';
 import { API_ROUTES } from '@constants/routes';
 import { getUser, removeUser, saveUser } from '@/lib/dataStorage';
 
+interface Board {
+    _id: string;
+    title: string;
+}
+
 /**
  * Represents a user's data.
  */
@@ -16,6 +21,7 @@ export interface User {
         emailNotifications: boolean;
         mfa: boolean;
     };
+    boards: Board[];
 }
 
 /**
