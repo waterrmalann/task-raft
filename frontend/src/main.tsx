@@ -20,6 +20,8 @@ import UserSettings from '@pages/user/UserSettings.tsx';
 import UserProfileSubPage from './pages/user/UserProfileSubPage.tsx';
 import UserAccountSubPage from '@pages/user/UserAccountSubPage.tsx';
 import UserEmailVerificationPage from '@pages/user/UserEmailVerificationPage.tsx';
+import DashboardHomePage from '@pages/dash/DashboardHomePage.tsx';
+import BoardViewPage from '@pages/dash/BoardViewPage.tsx';
 
 const queryClient = new QueryClient();
 
@@ -40,6 +42,11 @@ const router = createBrowserRouter(
                     {/* todo: potentially an appearance subpage as well */}
                 </Route>
                 <Route path='/profile' element={<UserProfilePage />} />
+                <Route path="/dash" element={<UserDashboard />}>
+                    <Route index element={<DashboardHomePage />} />
+                    <Route path="boards/:boardId" element={<BoardViewPage />} />
+                    {/* <Route path="/:" */}
+                </Route>
                 <Route path='/dash' element={<UserDashboard />} />
             </Route>
 
