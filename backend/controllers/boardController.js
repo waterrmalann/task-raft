@@ -63,85 +63,11 @@ const getBoard = asyncHandler(async (req, res) => {
         res.status(404);
         throw new Error("Board not found.");
     }
-    res.status(200).json({success: true, data: {...board}});
-});
-
-
-// @desc    Adds a collaborator to a board.
-// route    POST /api/boards/:boardId/collaborators
-// @access  Private
-const addCollaborator = asyncHandler(async (req, res) => {
-    const {user, role} = req.body;
-    const {boardId} = req.params;
-    const board = await Board.findById(boardId);
-    if (!board) {
-        res.status(404);
-        throw new Error("Board not found.");
-    }
-    board.collaborators.push({
-        user,
-        active: false,
-        role 
-    });
-    await board.save();
-    res.status(200).json({success: true, collaboratorId: user});
-});
-
-// @desc    Remove a collaborator from the board.
-// route    DELETE /api/boards/:boardId/collaborators/:collaboratorId
-// @access  Private
-const removeCollaborator = asyncHandler(async (req, res) => {
-    const { boardId, collaboratorId } = req.params;
-    const board = await Board.findById(boardId);
-    
-    if (!board) {
-        res.status(404);
-        throw new Error("Board not found.");
-    }
-    
-    const collaboratorIndex = board.collaborators.findIndex(c => c._id === collaboratorId);
-    
-    if (collaboratorIndex === -1) {
-        res.status(404);
-        throw new Error("Collaborator not found.");
-    }
-    
-    board.collaborators.splice(collaboratorIndex, 1);
-    
-    await board.save();
-    
-    res.status(200).json({ success: true, message: "Collaborator removed successfully." });
-});
-
-// @desc    Edit a collaborator's status.
-// route    PUT /api/boards/:boardId/collaborators/:collaboratorId
-// @access  Private
-const editCollaborator = asyncHandler(async (req, res) => {
-    const { boardId, collaboratorId } = req.params;
-    const { role } = req.body;
-    const board = await Board.findById(boardId);
-    
-    if (!board) {
-        res.status(404);
-        throw new Error("Board not found.");
-    }
-    
-    const collaborator = board.collaborators.find(c => c._id === collaboratorId);
-    
-    if (!collaborator) {
-        res.status(404);
-        throw new Error("Collaborator not found.");
-    }
-
-    collaborator.role = role;
-    
-    await board.save();
-    
-    res.status(200).json({ success: true, data: collaborator, message: "Collaborator role updated successfully." });
+    res.status(200).json({success: true, data: {success: true, data: {...board}}});
 });
 
 // @desc    Generate an invitation link for collaboration.
-// route    POST /api/boards/:boardId/collaborators/invite
+// route    POST /api/boards/:boardId/collaborators
 // @access  Private
 const inviteCollaborator = asyncHandler(async (req, res) => {
     const { boardId } = req.params;
@@ -172,7 +98,7 @@ const inviteCollaborator = asyncHandler(async (req, res) => {
 });
 
 // @desc    Accept an invitation link for collaboration.
-// route    GET /api/boards/:boardId/collaborators/invite
+// route    GET /api/boards/:boardId/collaborators
 // @access  Private
 const verifyCollaborator = asyncHandler(async (req, res) => {
     const { boardId } = req.params;
@@ -198,6 +124,59 @@ const verifyCollaborator = asyncHandler(async (req, res) => {
     await board.save();
     
     res.status(200).json({ success: true,  message: "Collaboration invite accepted." });
+});
+
+// @desc    Remove a collaborator from the board.
+// route    DELETE /api/boards/:boardId/collaborators/:collaboratorId
+// @access  Private
+const removeCollaborator = asyncHandler(async (req, res) => {
+    const { boardId, collaboratorId } = req.params;
+    const board = await Board.findById(boardId);
+    
+    if (!board) {
+        res.status(404);
+        throw new Error("Board not found.");
+    }
+    
+    const collaboratorIndex = board.collaborators.findIndex(c => c._id === collaboratorId);
+    
+    if (collaboratorIndex === -1) {
+        res.status(404);
+        throw new Error("Collaborator not found.");
+    }
+    
+    board.collaborators.splice(collaboratorIndex, 1);
+    
+    await board.save();
+    
+    res.status(200).json({ success: true, message: "Collaborator removed successfully." });
+});
+
+// @desc    Edit a collaborator's status.
+// route    PATCH /api/boards/:boardId/collaborators/:collaboratorId
+// @access  Private
+const editCollaborator = asyncHandler(async (req, res) => {
+    const { boardId, collaboratorId } = req.params;
+    const { role } = req.body;
+    const board = await Board.findById(boardId);
+    
+    if (!board) {
+        res.status(404);
+        throw new Error("Board not found.");
+    }
+    
+    const collaborator = board.collaborators.find(c => c._id === collaboratorId);
+    
+    if (!collaborator) {
+        res.status(404);
+        throw new Error("Collaborator not found.");
+    }
+
+    collaborator.role = role;
+    
+    await board.save();
+    
+    res.status(200).json({ success: true, data: collaborator, message: "Collaborator role updated successfully." });
 });
 
 // @desc    Adds a new list.
@@ -246,7 +225,7 @@ const editList = asyncHandler(async (req, res) => {
         throw new Error("List not found.");
     }
 
-    res.status(200).json({ success: true, data: list, message: "List was updated." });
+    res.status(200).json({ success: true, message: "List was updated." });
 });
 
 // @desc    Deletes a list.
@@ -348,7 +327,6 @@ export default {
     deleteBoard,
     getBoard,
 
-    addCollaborator,
     removeCollaborator,
     editCollaborator,
     inviteCollaborator,

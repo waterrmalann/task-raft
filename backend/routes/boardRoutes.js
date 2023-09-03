@@ -14,11 +14,10 @@ router.post("/", boardController.createBoard);
     router.get("/:boardId", boardController.getBoard);
 
 // Collaborators
-router.post("/:boardId/collaborators", boardController.addCollaborator);
-    router.put("/:boardId/collaborators/:collaboratorId", boardController.editCollaborator);
+router.get("/:boardId/collaborators/invite", boardController.verifyCollaborator);
+router.post("/:boardId/collaborators/", boardController.inviteCollaborator);
+    router.patch("/:boardId/collaborators/:collaboratorId", boardController.editCollaborator);
     router.delete("/:boardId/collaborators/:collaboratorId", boardController.removeCollaborator);
-    router.post("/:boardId/collaborators/invite", boardController.inviteCollaborator);
-    router.get("/:boardId/collaborators/invite", boardController.verifyCollaborator);
 
 // Lists
 router.post('/:boardId/lists', boardController.addList);
