@@ -1,5 +1,6 @@
 import asyncHandler from "express-async-handler";
 import User from '../models/userModel.js';
+import Board from '../models/boardModel.js';
 import generateToken from "../utils/generateTokens.js";
 import { getVerificationLink, sendOTPEmail, sendVerificationEmail } from "../utils/mailer.js";
 import { generateOTP, generateVerificationCode } from "../utils/utils.js";
@@ -50,14 +51,20 @@ const loginUser = asyncHandler(async (req, res) => {
                         preferences: {
                             emailNotifications: false,
                             mfa: user.preferences.mfa
-                        }
+                        },
+                        boards: []
                     }
                 })
                 return;
             }
 
         }
-        
+
+        const boards = await Board.find({createdBy: user._id})
+        .select('_id title')
+        .sort({ modifiedAt: -1 }) // latest first
+        .lean();
+    console.log("Boards: " + boards);
         generateToken(res, user._id);
         res.status(201).json({
             success: true,
@@ -70,7 +77,8 @@ const loginUser = asyncHandler(async (req, res) => {
                 preferences: {
                     emailNotifications: user.preferences.emailNotifications,
                     mfa: user.preferences.mfa
-                }
+                },
+                boards: [...boards]
             }
         })
         console.log(`🔰 [login] @${user.username} has logged in.`);
@@ -162,6 +170,11 @@ const verifyEmail = asyncHandler(async (req, res) => {
 // route    GET /api/user
 // @access  Private
 const getUserData = asyncHandler(async (req, res) => {
+    const boards = await Board.find({createdBy: req.user._id})
+        .select('_id title')
+        .sort({ modifiedAt: -1 }) // latest first
+        .lean();
+
     const userData = {
         _id: req.user._id,
         name: req.user?.name,
@@ -170,7 +183,10 @@ const getUserData = asyncHandler(async (req, res) => {
         premium: req.user.premium,
         preferences: {
             ...req.user.preferences
-        }
+        },
+        boards: [
+            ...boards
+        ]
     }
     res.status(200).json(userData);
 });
