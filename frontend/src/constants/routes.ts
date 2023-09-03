@@ -1,3 +1,5 @@
+import { Id } from "@components/kanban/KanbanBoard";
+
 export const API_ROUTES = {
     /* AUTH ROUTES */
     POST_REGISTER_USER: '/api/user',
@@ -45,12 +47,12 @@ export const API_ROUTES = {
     },
     LIST: {
         POST: (boardId: string) => `/api/boards/${boardId}/lists`,
-        PATCH: (boardId: string, listId: string) => `/api/boards/${boardId}/lists/${listId}`,
-        DELETE: (boardId: string, listId: string) => `/api/boards/${boardId}/lists/${listId}`,
+        PATCH: (boardId: string, listId: Id) => `/api/boards/${boardId}/lists/${listId}`,
+        DELETE: (boardId: string, listId: Id) => `/api/boards/${boardId}/lists/${listId}`,
     },
     CARD: {
         POST: (boardId: string) => `/api/boards/${boardId}/cards`,
-        PATCH: (boardId: string, cardId: string) => `/api/boards/${boardId}/cards/${cardId}`,
-        DELETE: (boardId: string, cardId: string) => `/api/boards/${boardId}/cards/${cardId}`,
+        PATCH: (boardId: string, cardId: Id) => `/api/boards/${boardId}/cards/${cardId}`,
+        DELETE: (boardId: string, cardId: Id) => `/api/boards/${boardId}/cards/${cardId}`,
     },
 };
