@@ -18,8 +18,11 @@ import {
 import { Link } from "react-router-dom"
 import { cn, getInitials } from "@/lib/utils"
 import { Search } from "./forms/Search"
+import {RxHamburgerMenu} from 'react-icons/rx';
+
 import useUser from "@hooks/user/useUser"
 import useLogout from "@hooks/user/useLogout"
+import { useSidebar } from "@/stores/useSidebar"
 
 export function UserNav() {
 
@@ -75,6 +78,7 @@ export function UserNav() {
     )
 }
 
+
 function MainNav({
     className,
     ...props
@@ -101,12 +105,20 @@ function MainNav({
 }
 
 export function TopBar() {
+
+    const sidebar = useSidebar();
+
+    function toggleSideBar() {
+        sidebar.toggle(!sidebar.isOpen);
+    }
+
     return (
         <>
             <div className="hidden flex-col md:flex">
                 <div className="border-b">
                     <div className="flex h-16 items-center px-4">
                         <div className="flex items-center text-lg font-medium">
+                            <RxHamburgerMenu className="mx-2 cursor-pointer" onClick={toggleSideBar} />
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 24 24"

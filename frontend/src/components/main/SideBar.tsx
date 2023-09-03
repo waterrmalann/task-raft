@@ -2,9 +2,15 @@ import { cn } from "@/lib/utils"
 import { Button } from "@components/ui/button"
 
 interface SideBarProps extends React.HTMLAttributes<HTMLDivElement> {
+    isOpen: boolean;
 }
 
-export function SideBar({ className }: SideBarProps) {
+export function SideBar({ isOpen, className }: SideBarProps) {
+
+    if (!isOpen) {
+        return <></>
+    }
+
     return (
         <div className={cn("pb-12", className)}>
             <div className="space-y-4 py-4">
