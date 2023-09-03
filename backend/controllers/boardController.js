@@ -1,10 +1,11 @@
 import asyncHandler from "express-async-handler";
-import Board from "../models/boardModel";
-import List from "../models/listModel";
-import Card from "../models/cardModel";
-import User from "../models/userModel";
-import { generateVerificationCode } from "../utils/utils";
-import { getInviteLink, sendBoardInvite } from "../utils/mailer";
+import Board from "../models/boardModel.js";
+import List from "../models/listModel.js";
+import Card from "../models/cardModel.js";
+import User from "../models/userModel.js";
+import { generateVerificationCode } from "../utils/utils.js";
+import { getInviteLink, sendBoardInvite } from "../utils/mailer.js";
+
 
 // @desc    Creates a board with the given information.
 // route    POST /api/boards/
@@ -63,7 +64,18 @@ const getBoard = asyncHandler(async (req, res) => {
         res.status(404);
         throw new Error("Board not found.");
     }
-    res.status(200).json({success: true, data: {success: true, data: {...board}}});
+
+    const cards = await board.fetchCards();
+    const lists = await board.fetchLists();
+
+    const boardData = {
+        board: board.toObject(),
+        columns: lists,
+        tasks: cards
+    }
+    console.log(boardData);
+
+    res.status(200).json({success: true, data: boardData});
 });
 
 // @desc    Generate an invitation link for collaboration.
@@ -239,7 +251,7 @@ const deleteList = asyncHandler(async (req, res) => {
         res.status(404);
         throw new Error("Board not found.");
     }
-
+    // Retrieve and delete the list.
     const list = await List.findOneAndDelete({ columnId: listId, parentBoard: boardId });
 
     if (!list) {
@@ -247,7 +259,10 @@ const deleteList = asyncHandler(async (req, res) => {
         throw new Error("List not found.");
     }
 
-    res.status(200).json({ success: true, message: "List was deleted." });
+    // Delete all the associated cards within the list.
+    const result = await Card.deleteMany({ columnId: listId, parentBoard: boardId });
+
+    res.status(200).json({ success: true, message: `Deleted list and ${result.deletedCount} cards.` });
 });
 
 // @desc    Adds a new card.
