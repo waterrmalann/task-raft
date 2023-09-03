@@ -14,7 +14,11 @@ export default function setupMailer() {
 }
 
 export function getVerificationLink(userId, code) {
-    return `http://localhost:3000/verify/${code}?uid=${userId}`
+    return `http://localhost:3000/verify/${code}?uid=${userId}`;
+}
+
+export function getInviteLink(boardId) {
+    return `http://localhost:3000/boards/${boardId}/invite`;
 }
 
 // Function to send OTP email
@@ -63,6 +67,29 @@ export function sendVerificationEmail(emailAddress, verificationLink) {
             console.error('Error sending verification email:', error);
         } else {
             console.log('verification email sent:', info.response);
+        }
+    });
+}
+
+export function sendBoardInvite(emailAddress, boardName, inviteLink) {
+    const mailOptions = {
+        from: process.env.MAIL_USERNAME,
+        to: emailAddress,
+        subject: 'TaskRaft Board Invite',
+        html: `
+      <h1>You have been invited to collaborate on "${boardName}" board.</h1>
+      <a href="${inviteLink}">Accept Invitation</a><br />
+      <p>If you do not wish to accept, you can ignore this email.</p>
+      <p>~ TaskRaft</p>
+    `,
+    };
+
+    // Send the email
+    transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+            console.error('Error sending collaboration invite email:', error);
+        } else {
+            console.log('Collaboration email sent:', info.response);
         }
     });
 }
