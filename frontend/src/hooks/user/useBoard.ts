@@ -1,6 +1,7 @@
 import { API_ROUTES } from '@constants/routes';
 import { useMutation, useQuery } from '@tanstack/react-query';
-
+import { Column, Id, Task } from '@components/kanban/KanbanBoard';
+import { useRefetch } from '@/stores/useRefetch';
 interface ErrorResponse {
     success: false;
     message: string;
@@ -12,7 +13,7 @@ interface SuccessResponse {
     message: string;
 }
 
-type GenericResponse = ErrorResponse | SuccessResponse;
+export type GenericResponse = ErrorResponse | SuccessResponse;
 
 interface Collaborator {
     user: string; // Assuming the user is identified by a string (e.g., user's ID)
@@ -21,17 +22,24 @@ interface Collaborator {
 }
 
 interface Board {
-    _id: string; // Assuming the board has an ID
+    _id: string;
     title: string;
     description?: string | null; // Description is optional and can be null
     visibility: "PUBLIC" | "PRIVATE";
-    createdBy: string; // Assuming the user is identified by a string (e.g., user's ID)
+    createdBy: string;
     collaborators: Collaborator[];
     createdAt: Date;
     updatedAt: Date;
 }
 
-type GetBoardResponse = { success: true; data: Board } | ErrorResponse;
+interface BoardData {
+    board: Board;
+    columns: Column[];
+    tasks: Task[];
+}
+
+type GetBoardResponse = { success: true; data: BoardData } | ErrorResponse;
+
 
 // --
 interface EditBoardParams {
@@ -53,12 +61,12 @@ interface InviteCollaboratorParams {
 }
 
 interface AddListParams {
-    columnId: string;
+    columnId: Id;
     title: string;
 }
 
 interface EditListParams {
-    listId: string;
+    listId: Id;
     data: {
         title: string;
     }
@@ -66,15 +74,15 @@ interface EditListParams {
 
 interface AddCardParams {
     title: string;
-    taskId: string;
-    columnId: string;
+    taskId: Id;
+    columnId: Id;
 }
 
 interface EditCardParams {
-    cardId: string;
+    cardId: Id;
     data: {
         title: string;
-        description: string;
+        description?: string;
     }
 }
 
@@ -85,19 +93,28 @@ interface EditCardParams {
  * @returns An object containing the loginMutation function that triggers the login process.
  */
 const useBoard = (boardId: string) => {
+    const {isEnabled} = useRefetch();
 
     const queryKey = ['board', boardId];
 
-    const getBoardQuery = useQuery<Board, Error>(
+    const getBoardQuery = useQuery<BoardData, Error>(
         queryKey,
         async () => {
             // Fetch the board data based on the boardId
             const response = await fetch(API_ROUTES.BOARD.GET(boardId));
+            console.log("Requested.");
             const data = await response.json() as GetBoardResponse;
             if (!data.success) {
                 throw new Error(data.message);
             }
             return data.data;
+        }, {
+            refetchInterval: 5000,
+            staleTime: 5000,
+            refetchOnMount: false,
+            refetchOnWindowFocus: true,
+            refetchOnReconnect: true,
+            enabled: isEnabled
         }
     );
 
@@ -137,7 +154,7 @@ const useBoard = (boardId: string) => {
         async (data) => {
 
             const response = await fetch(API_ROUTES.COLLABORATOR.GENERATE_POST(boardId), {
-                method: 'PATCH',
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -151,21 +168,6 @@ const useBoard = (boardId: string) => {
             return res;
         }
     );
-
-    const verifyCollaboratorQuery = useQuery<SuccessResponse, Error>(['collaboratorInvite'], async () => {
-
-        const response = await fetch(API_ROUTES.COLLABORATOR.INVITE_GET(boardId));
-        
-        const data = await response.json() as GenericResponse;
-        if (!data.success) {
-            throw new Error(data.message);
-        } else {
-            return data;
-        }
-    }, {
-        refetchOnMount: false,
-        refetchOnWindowFocus: false
-    });
 
     const editCollaboratorMutation = useMutation<SuccessResponse, Error, EditCollaboratorParams>(
         async ({collaboratorId, data}) => {
@@ -204,7 +206,7 @@ const useBoard = (boardId: string) => {
         async (data) => {
 
             const response = await fetch(API_ROUTES.LIST.POST(boardId), {
-                method: 'PATCH',
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -238,7 +240,7 @@ const useBoard = (boardId: string) => {
         }
     );
 
-    const deleteListMutation = useMutation<SuccessResponse, Error, string>(
+    const deleteListMutation = useMutation<SuccessResponse, Error, Id>(
         async (listId) => {
             const response = await fetch(API_ROUTES.LIST.DELETE(boardId, listId), {
                 method: 'DELETE'
@@ -255,7 +257,7 @@ const useBoard = (boardId: string) => {
         async (data) => {
 
             const response = await fetch(API_ROUTES.CARD.POST(boardId), {
-                method: 'PATCH',
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -289,7 +291,7 @@ const useBoard = (boardId: string) => {
         }
     );
 
-    const deleteCardMutation = useMutation<SuccessResponse, Error, string>(
+    const deleteCardMutation = useMutation<SuccessResponse, Error, Id>(
         async (cardId) => {
             // Send a request to delete a card.
             const response = await fetch(API_ROUTES.CARD.DELETE(boardId, cardId), {
@@ -308,7 +310,6 @@ const useBoard = (boardId: string) => {
         editBoardMutation,
         deleteBoardMutation,
 
-        verifyCollaboratorQuery,
         inviteCollaboratorMutation,
         editCollaboratorMutation,
         removeCollaboratorMutation,
