@@ -10,7 +10,7 @@ const cardSchema = mongoose.Schema(
             type: String,
         },
         taskId: {
-            type: Number,
+            type: String,
             required: true
         },
         columnId: {

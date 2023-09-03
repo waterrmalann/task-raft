@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import List from "./listModel";
-import Card from "./cardModel";
+import List from "./listModel.js";
+import Card from "./cardModel.js";
 
 const boardSchema = mongoose.Schema(
     {
@@ -49,7 +49,17 @@ const boardSchema = mongoose.Schema(
 
 boardSchema.methods.fetchLists = async function() {
     try {
-        const lists = await List.find({parentBoard: this._id});
+        let lists = await List.find({parentBoard: this._id}).select({
+            columnId: 1,
+            title: 1
+        })
+        .lean();
+        lists = lists.map((list) => {
+            return {
+              id: list.columnId,
+              title: list.title,
+            };
+        });
         return lists;
     } catch (error) {
         console.error(error);
@@ -59,7 +69,19 @@ boardSchema.methods.fetchLists = async function() {
 
 boardSchema.methods.fetchCards = async function() {
     try {
-        const cards = await Card.find({parentBoard: this._id});
+        let cards = await Card.find({parentBoard: this._id}).select({
+            taskId: 1,
+            columnId: 1,
+            title: 1,
+          })
+          .lean();
+        cards = cards.map((card) => {
+            return {
+                id: card.taskId,
+                columnId: card.columnId,
+                content: card.title
+            };
+        });
         return cards;
     } catch (error) {
         console.error(error);

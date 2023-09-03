@@ -10,10 +10,6 @@ const listSchema = mongoose.Schema(
             type: String,
             required: true
         },
-        listOrder: {
-            type: Number,
-            required: true
-        },
         parentBoard: {
             type: mongoose.Schema.Types.ObjectId,
             required: true,
