@@ -5,6 +5,7 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
+import boardRoutes from './routes/boardRoutes.js';
 import { errorHandler, notFound } from './middlewares/errorMiddleware.js';
 import setupMailer from './utils/mailer.js';
 
@@ -19,6 +20,7 @@ app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
 
 app.use('/api/user', userRoutes);
+app.use('/api/boards', boardRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
