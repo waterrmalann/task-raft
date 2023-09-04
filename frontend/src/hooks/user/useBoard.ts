@@ -56,8 +56,8 @@ interface EditCollaboratorParams {
 }
 
 interface InviteCollaboratorParams {
-    userId: string;
-    role: string;
+    userEmail: string;
+    role: "EDITOR" | "VIEWER";
 }
 
 interface AddListParams {
