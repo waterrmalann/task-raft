@@ -19,6 +19,8 @@ import useBoard from '@hooks/user/useBoard';
 import { useToast } from '@components/ui/use-toast';
 import { useRefetch } from '@/stores/useRefetch';
 import LoadingSpinner from '@components/LoadingSpinner';
+// import { Button } from '@components/ui/button';
+import InviteCollaboratorModal from '@components/modals/InviteCollaboratorModal';
 
 export type Id = string | number;
 
@@ -81,9 +83,12 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
 
     return (
         <>
-            <div className="m-auto px-[40px] pb-[30px]">
-                <h1 className="text-xl font-bold">{boardData?.board.title || "Untitled Board"}</h1>
-                <p>{boardData?.board.description}</p>
+            <div className="m-auto px-[40px] pb-[30px] w-full flex justify-between items-start">
+                <div>
+                    <h1 className="text-xl font-bold">{boardData?.board.title || "Untitled Board"}</h1>
+                    <p>{boardData?.board.description}</p>
+                </div>
+                <InviteCollaboratorModal inviteCollaborator={inviteCollaborator} />
             </div>
             <div className="m-auto flex h-full w-full items-start overflow-x-auto overflow-y-hidden px-[40px]">
                 <DndContext
@@ -255,6 +260,21 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
             from,
             to
         });
+    }
+
+    async function inviteCollaborator(collaboratorEmail: string) {
+        try {
+            // todo: Make role dynamic.
+            const res = await thisBoard.inviteCollaboratorMutation.mutateAsync({userEmail: collaboratorEmail, role: "EDITOR"});
+            if (res.success) {
+                return true;
+            }
+        } catch (error) {
+            // todo: Handle client-side errors better.
+            console.error(error);
+        }
+
+        return false;
     }
 
     function onDragStart(event: DragStartEvent) {
