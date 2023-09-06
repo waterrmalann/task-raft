@@ -3,7 +3,6 @@ import Board from "../models/boardModel.js";
 import List from "../models/listModel.js";
 import Card from "../models/cardModel.js";
 import User from "../models/userModel.js";
-import { generateVerificationCode } from "../utils/utils.js";
 import { getInviteLink, sendBoardInvite } from "../utils/mailer.js";
 
 
@@ -73,7 +72,7 @@ const getBoard = asyncHandler(async (req, res) => {
         columns: lists,
         tasks: cards
     }
-    console.log(boardData);
+    console.log(`🌀 [refetch : ${Date.now()}] @${req.user.username} is polling '${boardData.board.title}' board.`)
 
     res.status(200).json({success: true, data: boardData});
 });
@@ -83,14 +82,14 @@ const getBoard = asyncHandler(async (req, res) => {
 // @access  Private
 const inviteCollaborator = asyncHandler(async (req, res) => {
     const { boardId } = req.params;
-    const { userId, role } = req.body;
+    const { userEmail, role } = req.body;
 
     const board = await Board.findById(boardId);
     if (!board) {
         res.status(404);
         throw new Error("Board not found.");
     }
-    const user = await User.findById(userId);
+    const user = await User.findOne({email: userEmail});
     if (!user) {
         res.status(404);
         throw new Error("User not found.");
@@ -98,7 +97,7 @@ const inviteCollaborator = asyncHandler(async (req, res) => {
 
     const link = getInviteLink(board._id);
     board.collaborators.push({
-        user: userId,
+        user: user._id,
         active: false,
         role 
     });
