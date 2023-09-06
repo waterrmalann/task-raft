@@ -1,15 +1,15 @@
 {
   "name": "task-raft",
   "version": "1.0.0",
-  "description": "A task-managemen web application as a service.",
+  "description": "A task-management web application as a service.",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node backend/server.js",
     "server": "nodemon backend/server.js",
-    "client": "npm run dev --prefix frontend",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+    "client": "pnpm -C frontend run dev",
+    "dev": "concurrently \"pnpm run server\" \"pnpm run client\""
   },
   "author": "Alan",
   "license": "MIT",
