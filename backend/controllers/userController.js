@@ -123,7 +123,6 @@ const registerUser = asyncHandler(async (req, res) => {
             throw new Error("Unable to set verification code.");
         }
         const link = getVerificationLink(user._id, code);
-
         sendVerificationEmail(user.email, link);
     } else {
         res.status(400);
@@ -214,13 +213,26 @@ const updateUserData = asyncHandler(async (req, res) => {
             return res.json({success: false, message: "Email address is not available."})
         }
         user.email = newData.email;
+
+        const code = generateVerificationCode();
+        const success = await user.setVerificationCode(code);
+        if (!success) {
+            throw new Error("Unable to set verification code.");
+        }
+        const link = getVerificationLink(user._id, code);
+        user.verified = false; // The user is no longer verified.
+        sendVerificationEmail(user.email, link);
     }
 
     if (newData?.preferences) {
         user.preferences = newData.preferences;
     }
     const updated = await user.save();
-    res.json({success: true, message: "Account details have been updated."})
+    if (updated.verified) {
+        res.json({success: true, message: "Account details have been updated."});
+    } else {
+        res.json({success: true, message: "Details updated, please verify new email address."});
+    }
 });
 
 export default {
