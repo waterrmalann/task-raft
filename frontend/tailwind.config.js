@@ -17,6 +17,7 @@ module.exports = {
     },
     extend: {
       colors: {
+        "offWhite": "#F8F8F8",
         "mainBackgroundColor": '#ddd',
         "columnBackgroundColor": '#fff',
         border: "hsl(var(--border))",

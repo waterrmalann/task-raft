@@ -17,7 +17,7 @@ export default function UserDashboard() {
                         <div className="grid lg:grid-cols-5">
                             <SideBar isOpen={sidebar.isOpen} className="hidden lg:block" />
                             <div className={cn(sidebar.isOpen ? "col-span-3 lg:col-span-4" : "col-span-4 lg:col-span-5", "lg:border-l")}>
-                                <div className="h-full px-4 py-6 lg:px-8">
+                                <div className="bg-offWhite h-full px-4 py-6 lg:px-8">
                                     <Outlet />
                                 </div>
                             </div>
