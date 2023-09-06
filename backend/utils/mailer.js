@@ -42,7 +42,7 @@ export function sendOTPEmail(emailAddress, otp) {
         if (error) {
             console.error('Error sending OTP email:', error);
         } else {
-            console.log('OTP email sent:', info.response);
+            console.log(`📧 [mail] Mail sent to ${emailAddress} for 2FA [${info.response}]`);
         }
     });
 }
@@ -66,7 +66,7 @@ export function sendVerificationEmail(emailAddress, verificationLink) {
         if (error) {
             console.error('Error sending verification email:', error);
         } else {
-            console.log('verification email sent:', info.response);
+            console.log(`📧 [mail] Mail sent to ${emailAddress} for Verification [${info.response}]`);
         }
     });
 }
@@ -89,7 +89,7 @@ export function sendBoardInvite(emailAddress, boardName, inviteLink) {
         if (error) {
             console.error('Error sending collaboration invite email:', error);
         } else {
-            console.log('Collaboration email sent:', info.response);
+            console.log(`📧 [mail] Mail sent to ${emailAddress} for Collaboration [${info.response}]`);
         }
     });
 }
