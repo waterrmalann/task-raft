@@ -118,6 +118,7 @@ export function TopBar() {
                 <div className="border-b">
                     <div className="flex h-16 items-center px-4">
                         <div className="flex items-center text-lg font-medium">
+                            {/* todo: Hide this in routes except for dashboard */}
                             <RxHamburgerMenu className="mx-2 cursor-pointer" onClick={toggleSideBar} />
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
