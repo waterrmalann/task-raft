@@ -74,6 +74,7 @@ boardSchema.methods.fetchCards = async function() {
             columnId: 1,
             title: 1,
           })
+          .sort('position')
           .lean();
         cards = cards.map((card) => {
             return {

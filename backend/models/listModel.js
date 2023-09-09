@@ -18,6 +18,9 @@ const listSchema = mongoose.Schema(
         createdBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User"
+        },
+        position: {
+            type: Number
         }
     },
     {

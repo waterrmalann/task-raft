@@ -27,6 +27,7 @@ router.post('/:boardId/lists', boardController.addList);
 // Cards
 router.post('/:boardId/cards', boardController.addCard);
     router.patch('/:boardId/cards/:cardId', boardController.editCard);
+    router.put('/:boardId/cards/:cardId', boardController.moveCard);
     router.delete('/:boardId/cards/:cardId', boardController.deleteCard);
 
 export default router;
