@@ -10,18 +10,20 @@ import { getInviteLink, sendBoardInvite } from "../utils/mailer.js";
 // route    POST /api/boards/
 // @access  Private
 const createBoard = asyncHandler(async (req, res) => {
-    const {title, description, visibility} = req.body;
+    const { title, description, visibility } = req.body;
     // title, description, visibility, createdBy, collaborators(user, active, role)
-    const board = await Board.create({title, description, visibility, createdBy: req.user._id });
-    res.status(201).json({success: true, message: "Successfully created board.", boardId: board._id});
+    const board = await Board.create({ title, description, visibility, createdBy: req.user._id });
+    res
+        .status(201)
+        .json({ success: true, message: "Successfully created board.", boardId: board._id });
 });
 
 // @desc    Updates information about a board.
 // route    PATCH /api/boards/:boardId
 // @access  Private
 const editBoard = asyncHandler(async (req, res) => {
-    const {title, description, visibility} = req.body;
-    const {boardId} = req.params;
+    const { title, description, visibility } = req.body;
+    const { boardId } = req.params;
     // title, description, visibility, createdBy, collaborators(user, active, role)
     const board = await Board.findById(boardId);
     if (!board) {
@@ -35,14 +37,16 @@ const editBoard = asyncHandler(async (req, res) => {
 
     await board.save();
 
-    res.status(200).json({success: true, message: "Successfully edited board."});
+    res
+        .status(200)
+        .json({ success: true, message: "Successfully edited board." });
 });
 
 // @desc    Deletes a board.
 // route    DELETE /api/boards/:boardId
 // @access  Private
 const deleteBoard = asyncHandler(async (req, res) => {
-    const {boardId} = req.params;
+    const { boardId } = req.params;
     const board = await Board.findById(boardId);
     if (!board) {
         res.status(404);
@@ -50,14 +54,16 @@ const deleteBoard = asyncHandler(async (req, res) => {
     }
     await board.deleteOne();
 
-    res.status(200).json({success: true, message: "Successfully edited board."});
+    res
+        .status(200)
+        .json({ success: true, message: "Successfully edited board." });
 });
 
 // @desc    Retrieves information on a board.
 // route    GET /api/boards/:boardId
 // @access  Private
 const getBoard = asyncHandler(async (req, res) => {
-    const {boardId} = req.params;
+    const { boardId } = req.params;
     const board = await Board.findById(boardId);
     if (!board) {
         res.status(404);
@@ -74,7 +80,9 @@ const getBoard = asyncHandler(async (req, res) => {
     }
     console.log(`🌀 [refetch : ${Date.now()}] @${req.user.username} is polling '${boardData.board.title}' board.`)
 
-    res.status(200).json({success: true, data: boardData});
+    res
+        .status(200)
+        .json({ success: true, data: boardData });
 });
 
 // @desc    Generate an invitation link for collaboration.
@@ -89,7 +97,7 @@ const inviteCollaborator = asyncHandler(async (req, res) => {
         res.status(404);
         throw new Error("Board not found.");
     }
-    const user = await User.findOne({email: userEmail});
+    const user = await User.findOne({ email: userEmail });
     if (!user) {
         res.status(404);
         throw new Error("User not found.");
@@ -99,13 +107,15 @@ const inviteCollaborator = asyncHandler(async (req, res) => {
     board.collaborators.push({
         user: user._id,
         active: false,
-        role 
+        role
     });
-    
+
     await board.save();
     sendBoardInvite(user.email, board.title, link);
-    
-    res.status(200).json({ success: true,  message: "User has been invited to collaborate." });
+
+    res
+        .status(200)
+        .json({ success: true, message: "User has been invited to collaborate." });
 });
 
 // @desc    Accept an invitation link for collaboration.
@@ -119,7 +129,7 @@ const verifyCollaborator = asyncHandler(async (req, res) => {
         res.status(404);
         throw new Error("Board not found.");
     }
-    
+
     if (!board?.collaborators) {
         res.status(404);
         throw new Error("This board is not accepting collaborators.");
@@ -133,8 +143,10 @@ const verifyCollaborator = asyncHandler(async (req, res) => {
 
     board.collaborators[collaboratorIndex].active = true;
     await board.save();
-    
-    res.status(200).json({ success: true,  message: "Collaboration invite accepted." });
+
+    res
+        .status(200)
+        .json({ success: true, message: "Collaboration invite accepted." });
 });
 
 // @desc    Remove a collaborator from the board.
@@ -143,24 +155,26 @@ const verifyCollaborator = asyncHandler(async (req, res) => {
 const removeCollaborator = asyncHandler(async (req, res) => {
     const { boardId, collaboratorId } = req.params;
     const board = await Board.findById(boardId);
-    
+
     if (!board) {
         res.status(404);
         throw new Error("Board not found.");
     }
-    
+
     const collaboratorIndex = board.collaborators.findIndex(c => c._id === collaboratorId);
-    
+
     if (collaboratorIndex === -1) {
         res.status(404);
         throw new Error("Collaborator not found.");
     }
-    
+
     board.collaborators.splice(collaboratorIndex, 1);
-    
+
     await board.save();
-    
-    res.status(200).json({ success: true, message: "Collaborator removed successfully." });
+
+    res
+        .status(200)
+        .json({ success: true, message: "Collaborator removed successfully." });
 });
 
 // @desc    Edit a collaborator's status.
@@ -170,24 +184,26 @@ const editCollaborator = asyncHandler(async (req, res) => {
     const { boardId, collaboratorId } = req.params;
     const { role } = req.body;
     const board = await Board.findById(boardId);
-    
+
     if (!board) {
         res.status(404);
         throw new Error("Board not found.");
     }
-    
+
     const collaborator = board.collaborators.find(c => c._id === collaboratorId);
-    
+
     if (!collaborator) {
         res.status(404);
         throw new Error("Collaborator not found.");
     }
 
     collaborator.role = role;
-    
+
     await board.save();
-    
-    res.status(200).json({ success: true, data: collaborator, message: "Collaborator role updated successfully." });
+
+    res
+        .status(200)
+        .json({ success: true, data: collaborator, message: "Collaborator role updated successfully." });
 });
 
 // @desc    Adds a new list.
@@ -208,8 +224,10 @@ const addList = asyncHandler(async (req, res) => {
         parentBoard: boardId,
         createdBy: req.user._id
     });
-    
-    res.status(201).json({ success: true, data: list, message: "List was created." });
+
+    res
+        .status(201)
+        .json({ success: true, data: list, message: "List was created." });
 });
 
 // @desc    Edits an existing list.
@@ -236,7 +254,9 @@ const editList = asyncHandler(async (req, res) => {
         throw new Error("List not found.");
     }
 
-    res.status(200).json({ success: true, message: "List was updated." });
+    res
+        .status(200)
+        .json({ success: true, message: "List was updated." });
 });
 
 // @desc    Deletes a list.
@@ -261,7 +281,9 @@ const deleteList = asyncHandler(async (req, res) => {
     // Delete all the associated cards within the list.
     const result = await Card.deleteMany({ columnId: listId, parentBoard: boardId });
 
-    res.status(200).json({ success: true, message: `Deleted list and ${result.deletedCount} cards.` });
+    res
+        .status(200)
+        .json({ success: true, message: `Deleted list and ${result.deletedCount} cards.` });
 });
 
 // @desc    Adds a new card.
@@ -282,12 +304,14 @@ const addCard = asyncHandler(async (req, res) => {
         parentBoard: boardId,
         createdBy: req.user._id
     });
-    
-    res.status(201).json({ success: true, data: card, message: "Card was created." });
+
+    res
+        .status(201)
+        .json({ success: true, data: card, message: "Card was created." });
 });
 
 // @desc    Edits an existing card.
-// route    PUT /api/boards/:boardId/cards/:cardId
+// route    PATCH /api/boards/:boardId/cards/:cardId
 // @access  Private
 const editCard = asyncHandler(async (req, res) => {
     const { boardId, cardId } = req.params;
@@ -310,7 +334,9 @@ const editCard = asyncHandler(async (req, res) => {
         throw new Error("Card not found.");
     }
 
-    res.status(200).json({ success: true, data: card, message: "Card was updated." });
+    res
+        .status(200)
+        .json({ success: true, data: card, message: "Card was updated." });
 });
 
 // @desc    Deletes a card.
@@ -319,20 +345,33 @@ const editCard = asyncHandler(async (req, res) => {
 const deleteCard = asyncHandler(async (req, res) => {
     const { boardId, cardId } = req.params;
 
-    const board = await Board.findById(boardId);
-    if (!board) {
-        res.status(404);
-        throw new Error("Board not found.");
-    }
-
-    const card = await Card.findOneAndDelete({ taskId: cardId, parentBoard: boardId });
-
+    const card = await Card.removeCard(boardId, cardId);
     if (!card) {
         res.status(404);
         throw new Error("Card not found.");
     }
 
-    res.status(200).json({ success: true, message: "Card was deleted." });
+    res
+        .status(200)
+        .json({ success: true, message: "Card was deleted." });
+});
+
+// @desc    Moves a card.
+// route    PUT /api/boards/:boardId/cards/:cardId
+// @access  Private
+const moveCard = asyncHandler(async (req, res) => {
+    const { boardId, cardId } = req.params;
+    const { columnId, position } = req.body;
+
+    const card = await Card.moveCard(boardId, cardId, { columnId, position });
+    if (!card) {
+        res.status(404);
+        throw new Error("Card not found.");
+    }
+
+    res
+        .status(200)
+        .json({ success: true, message: "Card was moved." });
 });
 
 export default {
@@ -352,5 +391,6 @@ export default {
 
     addCard,
     editCard,
-    deleteCard
+    deleteCard,
+    moveCard
 }
