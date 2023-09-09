@@ -8,7 +8,7 @@ interface ErrorResponse {
     stack?: string;
 }
 
-interface SuccessResponse {
+export interface SuccessResponse {
     success: true;
     message: string;
 }
@@ -32,7 +32,7 @@ interface Board {
     updatedAt: Date;
 }
 
-interface BoardData {
+export interface BoardData {
     board: Board;
     columns: Column[];
     tasks: Task[];
@@ -40,13 +40,6 @@ interface BoardData {
 
 type GetBoardResponse = { success: true; data: BoardData } | ErrorResponse;
 
-
-// --
-interface EditBoardParams {
-    title?: string;
-    description?: string;
-    visibility?: string;
-}
 
 interface EditCollaboratorParams {
     collaboratorId: string;
@@ -86,6 +79,14 @@ interface EditCardParams {
     }
 }
 
+interface MoveCardParams {
+    cardId: Id;
+    data: {
+        columnId: Id;
+        position: number;
+    }
+}
+
 /**
  * A custom hook for handling and managing boards.
  * 
@@ -115,38 +116,6 @@ const useBoard = (boardId: string) => {
             refetchOnWindowFocus: true,
             refetchOnReconnect: true,
             enabled: isEnabled
-        }
-    );
-
-    const editBoardMutation = useMutation<SuccessResponse, Error, EditBoardParams>(
-        async (body) => {
-            // Send a request to edit the board data
-            const response = await fetch(API_ROUTES.BOARD.PATCH(boardId), {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(body),
-            });
-            const data = await response.json() as GenericResponse;
-            if (!data.success) {
-                throw new Error(data.message);
-            }
-            return data;
-        }
-    );
-
-    const deleteBoardMutation = useMutation<SuccessResponse, Error, void>(
-        async () => {
-            // Send a request to delete the board.
-            const response = await fetch(API_ROUTES.BOARD.DELETE(boardId), {
-                method: 'DELETE'
-            });
-            const data = await response.json() as GenericResponse;
-            if (!data.success) {
-                throw new Error(data.message);
-            }
-            return data;
         }
     );
 
@@ -291,6 +260,25 @@ const useBoard = (boardId: string) => {
         }
     );
 
+    const moveCardMutation = useMutation<SuccessResponse, Error, MoveCardParams>(
+        async ({cardId, data}) => {
+
+            const response = await fetch(API_ROUTES.CARD.PUT(boardId, cardId), {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+
+            const res = await response.json() as GenericResponse;
+            if (!res.success) {
+                throw new Error(res.message);
+            }
+            return res;
+        }
+    );
+
     const deleteCardMutation = useMutation<SuccessResponse, Error, Id>(
         async (cardId) => {
             // Send a request to delete a card.
@@ -307,8 +295,6 @@ const useBoard = (boardId: string) => {
 
     return {
         getBoardQuery,
-        editBoardMutation,
-        deleteBoardMutation,
 
         inviteCollaboratorMutation,
         editCollaboratorMutation,
@@ -321,6 +307,7 @@ const useBoard = (boardId: string) => {
         addCardMutation,
         editCardMutation,
         deleteCardMutation,
+        moveCardMutation
     }
 }
 

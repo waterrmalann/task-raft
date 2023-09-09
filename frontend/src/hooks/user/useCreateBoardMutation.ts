@@ -52,7 +52,7 @@ const useCreateBoardMutation = () => {
                 if (responseData.success) {
                     toast({title: "Board", description: responseData.message});
                 } else {
-                    toast({variant:"destructive", title: "Error", description: responseData.message});
+                    toast({variant:"destructive", title: "Creation Error", description: responseData.message});
                 }
 
                 return responseData;
