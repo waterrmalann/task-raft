@@ -22,7 +22,7 @@ import { useRefetch } from '@/stores/useRefetch';
 import LoadingSpinner from '@components/LoadingSpinner';
 // import { Button } from '@components/ui/button';
 import InviteCollaboratorModal from '@components/modals/InviteCollaboratorModal';
-import EditBoardModal from '@components/modals/EditBoardModal';
+import EditBoardSheet from '@components/modals/EditBoardSheet';
 
 export type Id = string | number;
 
@@ -94,7 +94,7 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
                     <p>{boardData?.board.description}</p>
                 </div>
                 <div className="flex items-center gap-4">
-                    <EditBoardModal boardData={boardData} />
+                    <EditBoardSheet boardData={boardData} />
                     { (isFetching || isLoading) ? <LuLoader2 size={24} className="animate-spin" /> : <RxReload size={24} className="cursor-pointer" onClick={refetch} /> }
                 <InviteCollaboratorModal inviteCollaborator={inviteCollaborator} />
                 </div>
