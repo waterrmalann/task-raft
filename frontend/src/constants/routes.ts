@@ -53,6 +53,7 @@ export const API_ROUTES = {
     CARD: {
         POST: (boardId: string) => `/api/boards/${boardId}/cards`,
         PATCH: (boardId: string, cardId: Id) => `/api/boards/${boardId}/cards/${cardId}`,
+        PUT: (boardId: string, cardId: Id) => `/api/boards/${boardId}/cards/${cardId}`,
         DELETE: (boardId: string, cardId: Id) => `/api/boards/${boardId}/cards/${cardId}`,
     },
 };

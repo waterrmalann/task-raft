@@ -1,6 +1,7 @@
-import { RxPlus } from 'react-icons/rx';
+import { RxPlus, RxReload } from 'react-icons/rx';
+import {LuLoader2} from 'react-icons/lu';
 import { nanoid } from 'nanoid';
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import ColumnContainer from "./ColumnContainer";
 import {
     DndContext,
@@ -21,6 +22,7 @@ import { useRefetch } from '@/stores/useRefetch';
 import LoadingSpinner from '@components/LoadingSpinner';
 // import { Button } from '@components/ui/button';
 import InviteCollaboratorModal from '@components/modals/InviteCollaboratorModal';
+import EditBoardModal from '@components/modals/EditBoardModal';
 
 export type Id = string | number;
 
@@ -55,6 +57,9 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
     const { data: boardData, isLoading, refetch, isFetching } = thisBoard.getBoardQuery; // { isError} as well 
     const queryRefetch = useRefetch();
 
+    const taskRef = useRef<{from: Task | null, to: Task | number | null}>({from: null, to: null});
+
+
     useEffect(() => {
         if (!isLoading) {
             setColumns(boardData?.columns || []);
@@ -83,12 +88,16 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
 
     return (
         <>
-            <div className="m-auto px-[40px] pb-[30px] w-full flex justify-between items-start">
+            <div className="m-auto px-[40px] pb-[30px] w-full flex justify-between items-center">
                 <div>
                     <h1 className="text-xl font-bold">{boardData?.board.title || "Untitled Board"}</h1>
                     <p>{boardData?.board.description}</p>
                 </div>
+                <div className="flex items-center gap-4">
+                    <EditBoardModal boardData={boardData} />
+                    { (isFetching || isLoading) ? <LuLoader2 size={24} className="animate-spin" /> : <RxReload size={24} className="cursor-pointer" onClick={refetch} /> }
                 <InviteCollaboratorModal inviteCollaborator={inviteCollaborator} />
+                </div>
             </div>
             <div className="m-auto flex h-full w-full items-start overflow-x-auto overflow-y-hidden px-[40px]">
                 <DndContext
@@ -255,11 +264,31 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
         }
     }
 
-    function moveTask(from: Task, to: Task | null) {
-        console.log({
-            from,
-            to
-        });
+    async function moveTask(from: Task, to: Task | number) {
+        let pos: number;
+        if (typeof to === 'object') {
+            pos = tasks.filter((task) => task.columnId === to.columnId).findIndex(e => e.id === to.id);
+        } else {
+            pos = to;
+        }
+        console.log("Index pos " + pos);
+        try {
+            const res = await thisBoard.moveCardMutation.mutateAsync({
+                 cardId: from.id, 
+                 data: {
+                     columnId: typeof to !== 'number' ? to.columnId : from.columnId,
+                     position: pos,
+                     
+                }
+            });
+            if (res.success) {
+                return true;
+            }
+        } catch (error) {
+            console.error(error);
+        }
+
+        return false;
     }
 
     async function inviteCollaborator(collaboratorEmail: string) {
@@ -285,13 +314,14 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
 
         if (event.active.data.current?.type === "Task") {
             setActiveTask(event.active.data.current.task);
+            taskRef.current.from = event.active.data.current.task;
             return;
         }
     }
 
     function onDragEnd(event: DragEndEvent) {
-        setActiveColumn(null);
         setActiveTask(null);
+        setActiveColumn(null);
 
         const { active, over } = event;
         if (!over) return;
@@ -302,17 +332,57 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
         if (activeId === overId) return;
 
         const isActiveAColumn = active.data.current?.type === "Column";
-        if (!isActiveAColumn) return;
+        const isOverAColumn = over.data.current?.type === "Column";
+        const isActiveATask = active.data.current?.type === "Task";
+        const isOverATask = over.data.current?.type === "Task";
 
-        console.log("DRAG END");
-
-        setColumns((columns) => {
-            const activeColumnIndex = columns.findIndex((col) => col.id === activeId);
-
-            const overColumnIndex = columns.findIndex((col) => col.id === overId);
-
-            return arrayMove(columns, activeColumnIndex, overColumnIndex);
-        });
+        if (isActiveAColumn) {
+            setColumns((columns) => {
+                const activeColumnIndex = columns.findIndex((col) => col.id === activeId);
+    
+                const overColumnIndex = columns.findIndex((col) => col.id === overId);
+    
+                return arrayMove(columns, activeColumnIndex, overColumnIndex);
+            });
+        } else if (isActiveATask)  {
+            let from: Task, to: Task | number;
+            // Dropping a task over another task.
+            if (isActiveATask && isOverATask) {
+                setTasks((tasks) => {
+                    const activeIndex = tasks.findIndex((t) => t.id === activeId);
+                    const overIndex = tasks.findIndex((t) => t.id === overId);
+                    from = tasks[activeIndex];
+                    
+                    // Different column
+                    if (tasks[activeIndex].columnId != tasks[overIndex].columnId) {
+                        to = tasks[overIndex - 1];
+                        tasks[activeIndex].columnId = tasks[overIndex].columnId;
+                        moveTask(from, to);
+                        return arrayMove(tasks, activeIndex, overIndex - 1);
+                    }
+    
+                    const tasksWithinList = tasks.filter(t => t.columnId === tasks[activeIndex].columnId);
+                    const destIndex = tasksWithinList.findIndex(t => t.id === overId);
+                    // same column, diff pos
+                    to = destIndex;
+                    moveTask(from, to);
+                    return arrayMove(tasks, activeIndex, overIndex + 1);
+                });
+            }
+    
+            // Dropping a task over a column
+            if (isActiveATask && isOverAColumn) {
+                setTasks((tasks) => {
+                    const activeIndex = tasks.findIndex((t) => t.id === activeId);
+    
+                    tasks[activeIndex].columnId = overId;
+                    from = tasks[activeIndex]
+                    to = tasks.filter(e => e.id === overId).length; // To call the query
+                    moveTask(from, to);
+                    return arrayMove(tasks, activeIndex, activeIndex);
+                });
+            }
+        }
     }
 
     function onDragOver(event: DragOverEvent) {
@@ -324,40 +394,50 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
 
         if (activeId === overId) return;
 
-        const isActiveATask = active.data.current?.type === "Task";
-        const isOverATask = over.data.current?.type === "Task";
+    //     const isActiveATask = active.data.current?.type === "Task";
+    //     const isOverATask = over.data.current?.type === "Task";
 
-        if (!isActiveATask) return;
+    //     if (!isActiveATask) return;
 
-        // Dropping a task over another task.
-        if (isActiveATask && isOverATask) {
-            setTasks((tasks) => {
-                const activeIndex = tasks.findIndex((t) => t.id === activeId);
-                const overIndex = tasks.findIndex((t) => t.id === overId);
-                moveTask(tasks[activeIndex], tasks[overIndex]); // To call the query
+    //     let from: Task, to: Task | number;
+    //     // Dropping a task over another task.
+    //     if (isActiveATask && isOverATask) {
+    //         setTasks((tasks) => {
+    //             const activeIndex = tasks.findIndex((t) => t.id === activeId);
+    //             const overIndex = tasks.findIndex((t) => t.id === overId);
+    //             from = tasks[activeIndex];
+                
+    //             // Different column
+    //             if (tasks[activeIndex].columnId != tasks[overIndex].columnId) {
+    //                 to = tasks[overIndex - 1];
+    //                 tasks[activeIndex].columnId = tasks[overIndex].columnId;
+    //                 moveTask(from, to);
+    //                 return arrayMove(tasks, activeIndex, overIndex - 1);
+    //             }
 
-                if (tasks[activeIndex].columnId != tasks[overIndex].columnId) {
-                    tasks[activeIndex].columnId = tasks[overIndex].columnId;
-                    return arrayMove(tasks, activeIndex, overIndex - 1);
-                }
+    //             const tasksWithinList = tasks.filter(t => t.columnId === tasks[activeIndex].columnId);
+    //             const destIndex = tasksWithinList.findIndex(t => t.id === overId);
+    //             // same column, diff pos
+    //             to = destIndex;
+    //             moveTask(from, to);
+    //             return arrayMove(tasks, activeIndex, overIndex + 1);
+    //         });
+    //     }
 
-                return arrayMove(tasks, activeIndex, overIndex);
+    //     const isOverAColumn = over.data.current?.type === "Column";
 
-            });
-        }
+    //     // Dropping a task over a column
+    //     if (isActiveATask && isOverAColumn) {
+    //         setTasks((tasks) => {
+    //             const activeIndex = tasks.findIndex((t) => t.id === activeId);
 
-        const isOverAColumn = over.data.current?.type === "Column";
-
-        // Dropping a task over a column
-        if (isActiveATask && isOverAColumn) {
-            setTasks((tasks) => {
-                const activeIndex = tasks.findIndex((t) => t.id === activeId);
-
-                tasks[activeIndex].columnId = overId;
-                moveTask(tasks[activeIndex], null); // To call the query
-                return arrayMove(tasks, activeIndex, activeIndex);
-            });
-        }
+    //             tasks[activeIndex].columnId = overId;
+    //             from = tasks[activeIndex]
+    //             to = tasks.filter(e => e.id === overId).length; // To call the query
+    //             moveTask(from, to);
+    //             return arrayMove(tasks, activeIndex, activeIndex);
+    //         });
+    //     }
     }
 }
 
