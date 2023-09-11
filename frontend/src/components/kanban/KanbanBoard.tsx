@@ -1,4 +1,4 @@
-import { RxPlus, RxReload } from 'react-icons/rx';
+import { RxPlus, RxReload, RxGear } from 'react-icons/rx';
 import {LuLoader2} from 'react-icons/lu';
 import { nanoid } from 'nanoid';
 import { useMemo, useState, useEffect, useRef } from "react";
@@ -18,6 +18,7 @@ import { createPortal } from "react-dom";
 import TaskCard from "./TaskCard";
 import useBoard from '@hooks/user/useBoard';
 import { useToast } from '@components/ui/use-toast';
+import { Button } from '@components/ui/button';
 import { useRefetch } from '@/stores/useRefetch';
 import LoadingSpinner from '@components/LoadingSpinner';
 // import { Button } from '@components/ui/button';
@@ -94,9 +95,13 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
                     <p>{boardData?.board.description}</p>
                 </div>
                 <div className="flex items-center gap-4">
-                    <EditBoardSheet boardData={boardData} />
+                    <EditBoardSheet boardData={boardData}>
+                        <RxGear className="cursor-pointer" size={24} />
+                    </EditBoardSheet>
                     { (isFetching || isLoading) ? <LuLoader2 size={24} className="animate-spin" /> : <RxReload size={24} className="cursor-pointer" onClick={refetch} /> }
-                <InviteCollaboratorModal inviteCollaborator={inviteCollaborator} />
+                    <InviteCollaboratorModal inviteCollaborator={inviteCollaborator}>
+                        <Button variant="ghost">Invite</Button>
+                    </InviteCollaboratorModal>
                 </div>
             </div>
             <div className="m-auto flex h-full w-full items-start overflow-x-auto overflow-y-hidden px-[40px]">
