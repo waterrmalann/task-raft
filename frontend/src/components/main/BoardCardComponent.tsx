@@ -22,7 +22,7 @@ const BoardCardComponent = ({ _id, title, description, updatedAt }: Board) => {
                     </CardDescription>
                 </div>
                 <div className="flex items-center space-x-1 rounded-md bg-secondary text-secondary-foreground">
-                    <Link to={`/boards/${_id}`}><Button variant="secondary" className="px-3 shadow-none">
+                    <Link to={`/dash/boards/${_id}`}><Button variant="secondary" className="px-3 shadow-none">
                         <RxDoubleArrowRight className="mr-2 h-4 w-4" />
                         Open
                     </Button></Link>
