@@ -43,6 +43,7 @@ export const API_ROUTES = {
     },
     COLLABORATOR: {
         GENERATE_POST: (boardId: string) => `/api/boards/${boardId}/collaborators/`,
+        ACCEPT_GET: (boardId: string) => `/api/boards/${boardId}/collaborators/invite`,
         INVITE_GET: (boardId: string) => `/api/boards/${boardId}/collaborators/`,
         PATCH: (boardId: string, collaboratorId: string) => `/api/boards/${boardId}/collaborators/${collaboratorId}`,
         DELETE: (boardId: string, collaboratorId: string) => `/api/boards/${boardId}/collaborators/${collaboratorId}`,

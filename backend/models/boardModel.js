@@ -47,6 +47,15 @@ const boardSchema = mongoose.Schema(
     }
 );
 
+boardSchema.methods.hasCollaborator = function(userId) {
+    for (const collaborator of this.collaborators) {
+        if (collaborator.user.toString() === userId.toString()) {
+            return true;
+        }
+    }
+    return false;
+}
+
 boardSchema.methods.fetchLists = async function() {
     try {
         let lists = await List.find({parentBoard: this._id}).select({

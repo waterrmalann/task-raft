@@ -18,7 +18,7 @@ export function getVerificationLink(userId, code) {
 }
 
 export function getInviteLink(boardId) {
-    return `http://localhost:3000/boards/${boardId}/invite`;
+    return `http://localhost:3000/dash/boards/${boardId}/invite`;
 }
 
 // Function to send OTP email

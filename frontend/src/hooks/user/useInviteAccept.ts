@@ -21,8 +21,8 @@ export interface SuccessResponse {
 const useInviteAccept = (boardId: string) => {
     const acceptInviteQuery = useQuery<SuccessResponse, Error>(['collaboratorInvite'], async () => {
 
-        const response = await fetch(API_ROUTES.COLLABORATOR.INVITE_GET(boardId));
-        
+        const response = await fetch(API_ROUTES.COLLABORATOR.ACCEPT_GET(boardId));
+
         const data = await response.json() as GenericResponse;
         if (!data.success) {
             throw new Error(data.message);

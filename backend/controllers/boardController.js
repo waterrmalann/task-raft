@@ -72,6 +72,11 @@ const getBoard = asyncHandler(async (req, res) => {
         throw new Error("Board not found.");
     }
 
+    if (!board.hasCollaborator(req.user._id) && board.createdBy._id.toString() !== req.user._id.toString()) {
+        res.status(403);
+        throw new Error("Unauthorized.");
+    }
+
     const user = await User.findById(req.user._id);
 
     const recentBoards = user.recentBoards.filter(
@@ -141,6 +146,7 @@ const inviteCollaborator = asyncHandler(async (req, res) => {
 // @access  Private
 const verifyCollaborator = asyncHandler(async (req, res) => {
     const { boardId } = req.params;
+    console.log("Collabb");
 
     const board = await Board.findById(boardId);
     if (!board) {
@@ -148,14 +154,14 @@ const verifyCollaborator = asyncHandler(async (req, res) => {
         throw new Error("Board not found.");
     }
 
-    if (!board?.collaborators) {
-        res.status(404);
+    if (!board?.collaborators || board?.collaborators.length === 0) {
+        res.status(403);
         throw new Error("This board is not accepting collaborators.");
     }
 
-    const collaboratorIndex = board.collaborators.findIndex(c => c.user === req.user._id);
+    const collaboratorIndex = board.collaborators.findIndex(c => c.user.toString() === req.user._id.toString());
     if (!board.collaborators[collaboratorIndex]) {
-        res.status(404);
+        res.status(403);
         throw new Error("User is not invited for collaboration.");
     }
 

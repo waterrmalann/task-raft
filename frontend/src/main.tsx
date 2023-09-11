@@ -22,6 +22,7 @@ import UserAccountSubPage from '@pages/user/UserAccountSubPage.tsx';
 import UserEmailVerificationPage from '@pages/user/UserEmailVerificationPage.tsx';
 import DashboardHomePage from '@pages/dash/DashboardHomePage.tsx';
 import BoardViewPage from '@pages/dash/BoardViewPage.tsx';
+import InviteAcceptPage from '@pages/dash/InviteAcceptPage.tsx';
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ const router = createBrowserRouter(
                 <Route path='/profile' element={<UserProfilePage />} />
                 <Route path="/dash" element={<UserDashboard />}>
                     <Route index element={<DashboardHomePage />} />
+                    <Route path="boards/:boardId/invite" element={<InviteAcceptPage />} />
                     <Route path="boards/:boardId" element={<BoardViewPage />} />
                     {/* <Route path="/:" */}
                 </Route>
