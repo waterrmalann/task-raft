@@ -81,7 +81,7 @@ function ColumnContainer({
                     {!editMode && <span className="bg-pink-300 rounded-full px-3 py-1">{column.title}</span>}
                     {editMode && (
                         <input
-                            className="bg-pink-300 rounded-full px-3 py-1"
+                            className="bg-pink-300 rounded-full px-3 py-1 max-w-[128px]"
                             value={column.title}
                             onChange={(e) => updateColumn(column.id, e.target.value)}
                             autoFocus
