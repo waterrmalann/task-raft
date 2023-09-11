@@ -1,10 +1,11 @@
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 import { cn } from "@/lib/utils"
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import useUser from '@hooks/user/useUser';
 import CreateBoardModal from "@components/modals/CreateBoardModal";
+import {RxPlus, RxGear} from 'react-icons/rx';
 
 function BoardIcon() {
     return (
@@ -47,14 +48,29 @@ export function SideBar({ isOpen, className }: SideBarProps) {
                     </h2>
                     <div className="space-y-1">
                         {userData?.boards.map(board =>
-                            <NavLink key={board._id} to={`/dash/boards/${board._id}`}>
-                                <Button variant="ghost" className="w-full justify-start">
+                            <NavLink 
+                            key={board._id} 
+                            to={`/dash/boards/${board._id}`}
+                            className={({ isActive }) => {
+                                if (isActive) {
+                                    return cn(buttonVariants({ variant: "ghost" }), 'bg-muted hover:bg-muted', 'w-full justify-start');
+                                } else {
+                                    return cn(
+                                        buttonVariants({ variant: "ghost" }),
+                                        'hover:bg-transparent',
+                                        'w-full justify-start'
+                                    );
+                                }
+                            }}
+                            >
                                     <BoardIcon />
                                     {board.title}
-                                </Button>
                             </NavLink>
                         )}
-                        <CreateBoardModal />
+                        <CreateBoardModal>
+                            <Button variant="ghost" className="w-full justify-start"><RxPlus className="mr-2 h-4 w-4" /> Create Board</Button>
+                        </CreateBoardModal>
+
                     </div>
                 </div>
                 <div className="px-3 py-2">
@@ -62,30 +78,12 @@ export function SideBar({ isOpen, className }: SideBarProps) {
                         Overview
                     </h2>
                     <div className="space-y-1">
-                        <Button variant="ghost" className="w-full justify-start">
-                            <BoardIcon />
-                            Dashboard
-                        </Button>
-                        <Button variant="ghost" className="w-full justify-start">
-                            <BoardIcon />
-                            Boards
-                        </Button>
-                        <Button variant="ghost" className="w-full justify-start">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="mr-2 h-4 w-4"
-                            >
-                                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                                <circle cx="12" cy="7" r="4" />
-                            </svg>
-                            Teams
-                        </Button>
+                        <Link to="/dash">
+                            <Button variant="ghost" className="w-full justify-start">
+                                <BoardIcon />
+                                Dashboard
+                            </Button>
+                        </Link>
                         <Button variant="ghost" className="w-full justify-start">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -104,24 +102,13 @@ export function SideBar({ isOpen, className }: SideBarProps) {
                             </svg>
                             Templates
                         </Button>
-                        <Button variant="ghost" className="pt-10 w-full justify-start">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                className="mr-2 h-4 w-4"
-                            >
-                                <path d="m16 6 4 14" />
-                                <path d="M12 6v14" />
-                                <path d="M8 8v12" />
-                                <path d="M4 4v16" />
-                            </svg>
-                            Settings
-                        </Button>
+                        <div className="py-5"></div>
+                        <Link to="/user/">
+                            <Button variant="ghost" className="w-full justify-start">
+                                <RxGear className="mr-2 h-4 w-4" />
+                                Settings
+                            </Button>
+                        </Link>
                     </div>
                 </div>
             </div>
