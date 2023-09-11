@@ -55,11 +55,10 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
     const [activeColumn, setActiveColumn] = useState<Column | null>(null);
     const [activeTask, setActiveTask] = useState<Task | null>(null);
 
-    const { data: boardData, isLoading, refetch, isFetching } = thisBoard.getBoardQuery; // { isError} as well 
+    const { data: boardData, isLoading, refetch, isFetching, isError, error } = thisBoard.getBoardQuery; // { isError} as well 
     const queryRefetch = useRefetch();
 
     const taskRef = useRef<{from: Task | null, to: Task | number | null}>({from: null, to: null});
-
 
     useEffect(() => {
         if (!isLoading) {
@@ -83,6 +82,16 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
         })
     );
 
+    if (isError) {
+        return (
+            <div className="m-auto px-[40px] pb-[30px] w-full text-center">
+                <h1 className="text-8xl my-5">⚠</h1>
+                <h1 className="text-xl font-bold">{error.message}</h1>
+                <p>Either the board does not exist or you do not have access.</p>
+            </div>
+        )
+    }
+
     if (isLoading) {
         return <LoadingSpinner />
     }
@@ -96,7 +105,7 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
                 </div>
                 <div className="flex items-center gap-4">
                     <EditBoardSheet boardData={boardData}>
-                        <RxGear className="cursor-pointer" size={24} />
+                        <Button variant="ghost"><RxGear className="cursor-pointer" size={24} /></Button>
                     </EditBoardSheet>
                     { (isFetching || isLoading) ? <LuLoader2 size={24} className="animate-spin" /> : <RxReload size={24} className="cursor-pointer" onClick={refetch} /> }
                     <InviteCollaboratorModal inviteCollaborator={inviteCollaborator}>
