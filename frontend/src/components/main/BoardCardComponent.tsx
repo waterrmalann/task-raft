@@ -7,7 +7,7 @@ import {
 } from "@components/ui/card"
 import { Button } from "@components/ui/button"
 import { formatDistanceToNow } from 'date-fns';
-import { RxPlus } from 'react-icons/rx';
+import { RxDoubleArrowRight, RxCircle } from 'react-icons/rx';
 import { Link } from 'react-router-dom';
 import { Board } from "@hooks/user/useDashboard";
 
@@ -23,7 +23,7 @@ const BoardCardComponent = ({ _id, title, description, updatedAt }: Board) => {
                 </div>
                 <div className="flex items-center space-x-1 rounded-md bg-secondary text-secondary-foreground">
                     <Link to={`/boards/${_id}`}><Button variant="secondary" className="px-3 shadow-none">
-                        <RxPlus className="mr-2 h-4 w-4" />
+                        <RxDoubleArrowRight className="mr-2 h-4 w-4" />
                         Open
                     </Button></Link>
                 </div>
@@ -31,14 +31,10 @@ const BoardCardComponent = ({ _id, title, description, updatedAt }: Board) => {
             <CardContent>
                 <div className="flex space-x-4 text-sm text-muted-foreground">
                     <div className="flex items-center">
-                        <RxPlus className="mr-1 h-3 w-3 fill-sky-400 text-sky-400" />
+                        <RxCircle className="mr-1 h-3 w-3 fill-sky-400 text-sky-400" />
                         Board
                     </div>
-                    <div className="flex items-center">
-                        <RxPlus className="mr-1 h-3 w-3" />
-                        20k
-                    </div>
-                    <div>Updated {formatDistanceToNow(new Date(updatedAt))} ago</div>
+                    <div>• Updated {formatDistanceToNow(new Date(updatedAt))} ago</div>
                 </div>
             </CardContent>
         </Card>
