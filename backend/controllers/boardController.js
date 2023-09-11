@@ -5,7 +5,6 @@ import Card from "../models/cardModel.js";
 import User from "../models/userModel.js";
 import { getInviteLink, sendBoardInvite } from "../utils/mailer.js";
 
-
 // @desc    Creates a board with the given information.
 // route    POST /api/boards/
 // @access  Private
@@ -64,11 +63,30 @@ const deleteBoard = asyncHandler(async (req, res) => {
 // @access  Private
 const getBoard = asyncHandler(async (req, res) => {
     const { boardId } = req.params;
-    const board = await Board.findById(boardId);
+    const board = await Board.findById(boardId).populate({
+        path: 'createdBy',
+        select: 'username'
+    });
     if (!board) {
         res.status(404);
         throw new Error("Board not found.");
     }
+
+    const user = await User.findById(req.user._id);
+
+    const recentBoards = user.recentBoards.filter(
+        (visit) => visit.boardId.toString() !== boardId
+    );
+
+    recentBoards.push({
+        boardName: board.title,
+        createdBy: board.createdBy.username,
+        boardId: boardId,
+        timestamp: new Date(),
+    });
+    
+    user.recentBoards = recentBoards;
+    await user.save();
 
     const cards = await board.fetchCards();
     const lists = await board.fetchLists();

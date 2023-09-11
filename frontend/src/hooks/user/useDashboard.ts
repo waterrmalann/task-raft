@@ -8,10 +8,18 @@ export interface Board {
     updatedAt: Date;
 }
 
+interface RecentBoard {
+    boardName: string;
+    createdBy: string;
+    boardId: string;
+    timestamp: Date;
+}
+
 type SuccessResponse = {
     success: true;
     data: {
-        boards: Board[]
+        boards: Board[],
+        recentBoards: RecentBoard[]
     }
 }
 

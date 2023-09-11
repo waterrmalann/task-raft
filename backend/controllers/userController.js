@@ -243,12 +243,17 @@ const getDashboard = asyncHandler(async (req, res) => {
         .select('_id title description updatedAt')
         .sort({ updatedAt: -1 }) // latest first
         .lean() || [];
+    const recentBoards = await User.findById(req.user._id)
+        .select('recentBoards')
+        .lean();
+
     res
         .status(200)
         .json({ 
             success: true, 
             data: {
-                boards: boards
+                boards: boards,
+                recentBoards: recentBoards.recentBoards || []
             } 
         });
 });

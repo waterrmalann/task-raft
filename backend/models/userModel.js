@@ -65,7 +65,15 @@ const userSchema = mongoose.Schema(
         },
         verificationCodeExpiry: {
             type: Date
-        }
+        },
+        recentBoards: [
+            {
+                boardName: { type: String },
+                createdBy: { type: String },
+                boardId: { type: mongoose.Schema.Types.ObjectId, ref: 'Board', required: true },
+                timestamp: { type: Date, default: Date.now },
+            },
+        ]
     },
     {
         timestamps: true,
