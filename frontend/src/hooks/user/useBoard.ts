@@ -1,5 +1,5 @@
 import { API_ROUTES } from '@constants/routes';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Column, Id, Task } from '@components/kanban/KanbanBoard';
 import { useRefetch } from '@/stores/useRefetch';
 interface ErrorResponse {
@@ -97,19 +97,21 @@ const useBoard = (boardId: string) => {
     const {isEnabled} = useRefetch();
 
     const queryKey = ['board', boardId];
+    const queryClient = useQueryClient();
 
     const getBoardQuery = useQuery<BoardData, Error>(
         queryKey,
         async () => {
             // Fetch the board data based on the boardId
             const response = await fetch(API_ROUTES.BOARD.GET(boardId));
-            console.log("Requested.");
             const data = await response.json() as GetBoardResponse;
             if (!data.success) {
+                console.log("Threw the error.")
                 throw new Error(data.message);
             }
             return data.data;
         }, {
+            retry: false,
             refetchInterval: 5000,
             staleTime: 5000,
             refetchOnMount: false,
@@ -276,6 +278,10 @@ const useBoard = (boardId: string) => {
                 throw new Error(res.message);
             }
             return res;
+        }, {
+            onSuccess: () => {
+                queryClient.invalidateQueries(queryKey);
+            }
         }
     );
 
