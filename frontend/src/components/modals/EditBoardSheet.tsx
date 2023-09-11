@@ -2,7 +2,6 @@ import { useRef } from 'react';
 import { useToast } from "@components/ui/use-toast";
 
 import { Button } from "@/components/ui/button";
-import { RxGear } from 'react-icons/rx';
 import {
     Sheet,
     SheetClose,
@@ -21,9 +20,10 @@ import useEditBoardMutation from '@hooks/user/useEditBoardMutation';
 
 interface EditBoardSheetProps extends React.HTMLAttributes<HTMLDivElement> {
     boardData: BoardData | undefined;
+    children: React.ReactNode;
 }
 
-export default function EditBoardSheet({ boardData }: EditBoardSheetProps) {
+export default function EditBoardSheet({ boardData, children }: EditBoardSheetProps) {
 
     const boardEditMutation = useEditBoardMutation(boardData?.board._id || '');
     const { toast } = useToast();
@@ -65,7 +65,7 @@ export default function EditBoardSheet({ boardData }: EditBoardSheetProps) {
     return (
         <Sheet>
             <SheetTrigger asChild>
-                <RxGear className="cursor-pointer" size={24} />
+                {children}
             </SheetTrigger>
             <SheetContent>
                 <SheetHeader>

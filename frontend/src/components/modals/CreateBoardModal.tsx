@@ -4,7 +4,6 @@ import useCreateBoardMutation from "@hooks/user/useCreateBoardMutation";
 import { useToast } from "@components/ui/use-toast";
 
 import { Button } from "@/components/ui/button";
-import { RxPlus } from 'react-icons/rx';
 import {
     Dialog,
     DialogContent,
@@ -18,7 +17,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@components/ui/textarea";
 
-export default function CreateBoardModal() {
+interface CreateBoardModalProps extends React.HTMLAttributes<HTMLDivElement> {
+    children: React.ReactNode;
+}
+
+export default function CreateBoardModal({ children }: CreateBoardModalProps) {
 
     const boardCreationMutation = useCreateBoardMutation();
     const { toast } = useToast();
@@ -61,7 +64,7 @@ export default function CreateBoardModal() {
     return (
         <Dialog open={creationModal} onOpenChange={setCreationModal}>
             <DialogTrigger asChild>
-                <Button variant="ghost" className="w-full justify-start"><RxPlus className="mr-2 h-4 w-4" /> Create Board</Button>
+                {children}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>

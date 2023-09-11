@@ -15,9 +15,10 @@ import { useToast } from '@components/ui/use-toast';
 
 interface InviteCollaboratorModalProps extends React.HTMLAttributes<HTMLDivElement> {
     inviteCollaborator(collaboratorEmail: string): Promise<boolean>;
+    children: React.ReactNode;
 }
 
-export default function InviteCollaboratorModal({inviteCollaborator}: InviteCollaboratorModalProps) {
+export default function InviteCollaboratorModal({inviteCollaborator, children}: InviteCollaboratorModalProps) {
 
     const collaboratorRef = useRef<HTMLInputElement | null>(null);
     const {toast} = useToast();
@@ -42,7 +43,7 @@ export default function InviteCollaboratorModal({inviteCollaborator}: InviteColl
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <Button variant="ghost">Invite</Button>
+                {children}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
