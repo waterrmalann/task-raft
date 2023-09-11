@@ -11,6 +11,7 @@ router.post('/logout', userController.logoutUser);
 router.get('/verify/:code', userController.verifyEmail);
 
 router.get('/', isAuthenticated, userController.getUserData);
+router.get('/dashboard', isAuthenticated, userController.getDashboard);
 
 /* Profile Activity */
 router.patch('/profile', isAuthenticated, userController.updateUserData);

@@ -62,9 +62,9 @@ const loginUser = asyncHandler(async (req, res) => {
 
         const boards = await Board.find({createdBy: user._id})
         .select('_id title')
-        .sort({ modifiedAt: -1 }) // latest first
+        .sort({ updatedAt: -1 }) // latest first
         .lean();
-    console.log("Boards: " + boards);
+
         generateToken(res, user._id);
         res.status(201).json({
             success: true,
@@ -171,7 +171,7 @@ const verifyEmail = asyncHandler(async (req, res) => {
 const getUserData = asyncHandler(async (req, res) => {
     const boards = await Board.find({createdBy: req.user._id})
         .select('_id title')
-        .sort({ modifiedAt: -1 }) // latest first
+        .sort({ updatedAt: -1 }) // latest first
         .lean();
 
     const userData = {
@@ -235,6 +235,24 @@ const updateUserData = asyncHandler(async (req, res) => {
     }
 });
 
+// @desc    Retrieves dashboard information.
+// route    GET /api/dashboard
+// @access  Private
+const getDashboard = asyncHandler(async (req, res) => {
+    const boards = await Board.find({createdBy: req.user._id})
+        .select('_id title description updatedAt')
+        .sort({ updatedAt: -1 }) // latest first
+        .lean() || [];
+    res
+        .status(200)
+        .json({ 
+            success: true, 
+            data: {
+                boards: boards
+            } 
+        });
+});
+
 export default {
     loginUser,
     registerUser,
@@ -242,4 +260,6 @@ export default {
     verifyEmail,
     getUserData,
     updateUserData,
+
+    getDashboard
 }

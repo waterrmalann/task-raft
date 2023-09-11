@@ -32,7 +32,9 @@ export const API_ROUTES = {
     PREFERENCES: {
         PATCH: '/api/user/prefs'
     },
-
+    DASHBOARD: {
+        GET: "/api/user/dashboard"
+    },
     BOARD: {
         POST: '/api/boards',
         PATCH: (boardId: string) => `/api/boards/${boardId}`,
