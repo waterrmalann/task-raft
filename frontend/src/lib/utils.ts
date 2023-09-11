@@ -25,3 +25,21 @@ export function getInitials(name: string): string {
     const initials = words.map(word => word[0].toUpperCase()).join('').slice(0, 2);
     return initials;
 }
+
+/**
+ * Slugify a string by replacing spaces and special characters with hyphens
+ * and converting the string to lowercase.
+ *
+ * @param {String} input - The input string to slugify.
+ * @returns {String} The slugified string.
+ */
+export function slugify(input: string) {
+    // Remove special characters and replace spaces with hyphens
+    const slug = input
+      .trim()
+      .toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-');
+  
+    return slug;
+  }
