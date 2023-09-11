@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { RxTrash, RxPencil2 } from 'react-icons/rx';
+import {AiOutlineTags} from 'react-icons/ai';
 import { Id, Task } from "./KanbanBoard";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { AddLabelPopover } from "@components/modals/AddLabelPopover";
 
 interface Props {
     task: Task;
@@ -97,11 +99,16 @@ function TaskCard({ task, deleteTask, updateTask }: Props) {
 
             {mouseIsOver && (
                 <>
-                    <button
+                    {/* <button
                         className="stroke-white absolute right-10 top-1/2 -translate-y-1/2 bg-columnBackgroundColor p-2 rounded opacity-60 hover:opacity-100"
                     >
                         <RxPencil2 />
-                    </button>
+                    </button> */}
+                    <AddLabelPopover>
+                        <button className="stroke-white absolute right-10 top-1/2 -translate-y-1/2 bg-columnBackgroundColor p-2 rounded opacity-60 hover:opacity-100">
+                            <AiOutlineTags className="" size={20} />
+                        </button>
+                    </AddLabelPopover>
                     <button
                         onClick={() => {
                             deleteTask(task.id);
