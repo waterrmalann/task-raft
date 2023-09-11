@@ -15,7 +15,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import { Link } from "react-router-dom"
+import { Link, NavLink } from "react-router-dom"
 import { cn, getInitials } from "@/lib/utils"
 import { Search } from "./forms/Search"
 import {RxHamburgerMenu} from 'react-icons/rx';
@@ -59,14 +59,14 @@ export function UserNav() {
                         <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
                     </DropdownMenuItem></Link>
                     <DropdownMenuItem>
-                        Billing
+                        Premium
                         <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
                     </DropdownMenuItem>
                     <Link to="/user/account"><DropdownMenuItem>
                         Settings
                         <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
                     </DropdownMenuItem></Link>
-                    <DropdownMenuItem>New Team</DropdownMenuItem>
+                    <DropdownMenuItem>New</DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
@@ -88,18 +88,38 @@ function MainNav({
             className={cn("flex items-center space-x-4 lg:space-x-6", className)}
             {...props}
         >
-            <Link
+            <NavLink
                 to="/dash"
-                className="text-sm font-medium transition-colors hover:text-primary"
+                className={({ isActive }) => {
+                    if (isActive) {
+                        return cn('text-sm font-medium', 'transition-colors', 'text-primary underline');
+                    } else {
+                        return cn(
+                            'text-sm font-medium',
+                            'transition-colors',
+                            'hover:text-primary hover:underline'
+                        );
+                    }
+                }}
             >
                 Overview
-            </Link>
-            <Link
+            </NavLink>
+            <NavLink
                 to="/user/account"
-                className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                className={({ isActive }) => {
+                    if (isActive) {
+                        return cn('text-sm font-medium', 'transition-colors', 'text-primary underline');
+                    } else {
+                        return cn(
+                            'text-sm font-medium',
+                            'transition-colors',
+                            'hover:text-primary hover:underline'
+                        );
+                    }
+                }}
             >
                 Settings
-            </Link>
+            </NavLink>
         </nav>
     )
 }
