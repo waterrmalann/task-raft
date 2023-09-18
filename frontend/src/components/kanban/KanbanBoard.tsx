@@ -24,6 +24,7 @@ import LoadingSpinner from '@components/LoadingSpinner';
 // import { Button } from '@components/ui/button';
 import InviteCollaboratorModal from '@components/modals/InviteCollaboratorModal';
 import EditBoardSheet from '@components/modals/EditBoardSheet';
+import useUser from '@hooks/user/useUser';
 
 export type Id = string | number;
 
@@ -36,6 +37,7 @@ export type Task = {
     id: Id;
     columnId: Id;
     content: string;
+    label?: string | undefined;
 };
 
 interface KanbanBoardProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -45,6 +47,7 @@ interface KanbanBoardProps extends React.HTMLAttributes<HTMLDivElement> {
 function KanbanBoard({ boardId }: KanbanBoardProps) {
     const { toast } = useToast();
 
+    const userQuery = useUser();
     const thisBoard = useBoard(boardId || '');
 
     const [columns, setColumns] = useState<Column[]>([]);
@@ -59,6 +62,12 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
     const queryRefetch = useRefetch();
 
     const taskRef = useRef<{from: Task | null, to: Task | number | null}>({from: null, to: null});
+
+    // todo: Fix this.
+    const canEditBoard = useMemo(() => {
+        const isCollaborator = boardData?.board.collaborators.find(user => user.role === 'EDITOR' && user.user === userQuery.data?._id);
+        return (isCollaborator === undefined || boardData?.board.createdBy._id !== userQuery.data?._id)
+    }, [userQuery.data?._id, boardData?.board.createdBy._id, boardData?.board.collaborators]);
 
     useEffect(() => {
         if (!isLoading) {
@@ -108,9 +117,13 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
                         <Button variant="ghost"><RxGear className="cursor-pointer" size={24} /></Button>
                     </EditBoardSheet>
                     { (isFetching || isLoading) ? <LuLoader2 size={24} className="animate-spin" /> : <RxReload size={24} className="cursor-pointer" onClick={refetch} /> }
-                    <InviteCollaboratorModal inviteCollaborator={inviteCollaborator}>
-                        <Button variant="ghost">Invite</Button>
-                    </InviteCollaboratorModal>
+                    { 
+                        canEditBoard &&  
+                        <InviteCollaboratorModal inviteCollaborator={inviteCollaborator}>
+                            <Button variant="ghost">Invite</Button>
+                        </InviteCollaboratorModal>
+                    }
+                    
                 </div>
             </div>
             <div className="m-auto flex h-full w-full items-start overflow-x-auto overflow-y-hidden px-[40px]">
@@ -142,7 +155,7 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
                                 await createNewColumn();
                             }}
                             disabled={isFetching}
-                            className="h-[50px] w-[250px] min-w-[250px] cursor-pointer rounded-lg bg-mainBackgroundColor border-2 border-columnBackgroundColor p-4 ring-rose-500 hover:ring-2 flex gap-2"
+                            className="h-[50px] w-[250px] min-w-[250px] cursor-pointer rounded-lg bg-mainBackgroundColor border-2 border-columnBackgroundColor p-4 flex gap-2 items-center"
                         >
                             <RxPlus />
                             Add Column

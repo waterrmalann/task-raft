@@ -339,7 +339,7 @@ const addCard = asyncHandler(async (req, res) => {
 // @access  Private
 const editCard = asyncHandler(async (req, res) => {
     const { boardId, cardId } = req.params;
-    const { title, description } = req.body;
+    const { title, description, label } = req.body;
 
     const board = await Board.findById(boardId);
     if (!board) {
@@ -349,7 +349,7 @@ const editCard = asyncHandler(async (req, res) => {
 
     const card = await Card.findOneAndUpdate(
         { taskId: cardId, parentBoard: boardId },
-        { title, description },
+        { title, description, label },
         { new: true }
     );
 

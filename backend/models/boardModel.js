@@ -82,6 +82,7 @@ boardSchema.methods.fetchCards = async function() {
             taskId: 1,
             columnId: 1,
             title: 1,
+            label: 1
           })
           .sort('position')
           .lean();
@@ -89,7 +90,8 @@ boardSchema.methods.fetchCards = async function() {
             return {
                 id: card.taskId,
                 columnId: card.columnId,
-                content: card.title
+                content: card.title,
+                label: card.label
             };
         });
         return cards;

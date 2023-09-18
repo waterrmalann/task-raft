@@ -25,6 +25,9 @@ const cardSchema = mongoose.Schema(
         position: {
             type: Number
         },
+        label: {
+            type: String,
+        },
         // checklist: [{
         //     title: {
         //         type: String,
