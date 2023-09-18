@@ -26,7 +26,10 @@ interface Board {
     title: string;
     description?: string | null; // Description is optional and can be null
     visibility: "PUBLIC" | "PRIVATE";
-    createdBy: string;
+    createdBy: {
+        _id: string;
+        username: string;
+    };
     collaborators: Collaborator[];
     createdAt: Date;
     updatedAt: Date;
@@ -114,6 +117,9 @@ const useBoard = (boardId: string) => {
             retry: false,
             refetchInterval: 5000,
             staleTime: 5000,
+            // refetchInterval: (data) => {
+            //     return 10000;
+            // }),
             refetchOnMount: false,
             refetchOnWindowFocus: true,
             refetchOnReconnect: true,
