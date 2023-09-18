@@ -67,13 +67,15 @@ pnpm install
 pnpm -C frontend install
 ```
 
-3. Run the project. (from root)
+3. Rename `.exmaple-env` to `.env` and configure the variables accordingly.
+
+4. Run the project. (from root)
 
 ```sh
 pnpm run dev
 ```
 
-4. Access the application.
+5. Access the application.
 
 ```
 Open your browser and visit http://localhost:3000
