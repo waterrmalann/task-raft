@@ -1,0 +1,8 @@
+NODE_ENV=development
+PORT=8000
+MONGO_URI=mongodb://localhost/taskraft
+JWT_SECRET=your-secret-here
+MAIL_USERNAME=mail@example.com
+MAIL_PASSWORD=password
+MAIL_HOST=example.com
+MAIL_PORT=465
