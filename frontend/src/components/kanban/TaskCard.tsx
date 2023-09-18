@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { RxTrash, RxPencil2 } from 'react-icons/rx';
+import { RxTrash } from 'react-icons/rx'; // RxPencil2
 import {AiOutlineTags} from 'react-icons/ai';
 import { Id, Task } from "./KanbanBoard";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { AddLabelPopover } from "@components/modals/AddLabelPopover";
+import { Badge } from "@/components/ui/badge"
+
 
 interface Props {
     task: Task;
@@ -47,7 +49,7 @@ function TaskCard({ task, deleteTask, updateTask }: Props) {
             <div
                 ref={setNodeRef}
                 style={style}
-                className="opacity-30 bg-mainBackgroundColor p-2.5 h-[60px] min-h-[60px] items-center flex text-left cursor-grab relative"
+                className="opacity-30 bg-mainBackgroundColor rounded-xl p-2.5 h-[60px] min-h-[60px] items-center flex text-left cursor-grab relative"
             />
         );
     }
@@ -59,7 +61,7 @@ function TaskCard({ task, deleteTask, updateTask }: Props) {
                 style={style}
                 {...attributes}
                 {...listeners}
-                className="bg-white border border-gray-200 shadow-md p-2.5 h-[60px] min-h-[60px] items-center flex text-left hover:ring-2 hover:ring-inset hover:ring-rose-500 cursor-grab relative"
+                className="bg-white border border-gray-200 shadow-md rounded-xl p-2.5 h-[60px] min-h-[60px] items-center flex text-left hover:ring-2 hover:ring-inset hover:ring-rose-500 cursor-grab relative"
             >
                 <textarea
                     className="h-[99%] w-full resize-none border-gray-500 rounded bg-transparent text-black focus:outline-none "
@@ -84,8 +86,8 @@ function TaskCard({ task, deleteTask, updateTask }: Props) {
             style={style}
             {...attributes}
             {...listeners}
-            onClick={toggleEditMode}
-            className="bg-white border border-gray-200 shadow-md p-2.5 h-[60px] min-h-[60px] items-center flex text-left cursor-grab relative task"
+            onDoubleClick={toggleEditMode}
+            className="bg-white border border-gray-200 shadow-md p-2.5 rounded-xl max-h-[90px] min-h-[60px] items-center flex text-left cursor-grab relative task"
             onMouseEnter={() => {
                 setMouseIsOver(true);
             }}
@@ -94,7 +96,7 @@ function TaskCard({ task, deleteTask, updateTask }: Props) {
             }}
         >
             <p className="my-auto h-[99%] w-full overflow-y-auto overflow-x-hidden whitespace-pre-wrap select-none">
-                {task.content}
+             {task?.label && <Badge>{task.label}</Badge>} {task.content}
             </p>
 
             {mouseIsOver && (
@@ -106,7 +108,7 @@ function TaskCard({ task, deleteTask, updateTask }: Props) {
                     </button> */}
                     <AddLabelPopover>
                         <button className="stroke-white absolute right-10 top-1/2 -translate-y-1/2 bg-columnBackgroundColor p-2 rounded opacity-60 hover:opacity-100">
-                            <AiOutlineTags className="" size={20} />
+                            <AiOutlineTags size={20} />
                         </button>
                     </AddLabelPopover>
                     <button
