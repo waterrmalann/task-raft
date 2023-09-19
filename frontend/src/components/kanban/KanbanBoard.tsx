@@ -25,6 +25,7 @@ import LoadingSpinner from '@components/LoadingSpinner';
 import InviteCollaboratorModal from '@components/modals/InviteCollaboratorModal';
 import EditBoardSheet from '@components/modals/EditBoardSheet';
 import useUser from '@hooks/user/useUser';
+import debounce from 'lodash/debounce';
 
 export type Id = string | number;
 
@@ -62,6 +63,23 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
     const queryRefetch = useRefetch();
 
     const taskRef = useRef<{from: Task | null, to: Task | number | null}>({from: null, to: null});
+    const debouncedUpdateTask = useRef(
+        debounce(async (id: Id, content: string) => {
+            console.log(`Updated: ${content}`);
+        try {
+            await thisBoard.editCardMutation.mutateAsync({ cardId: id, data: { title: content } });
+        } catch (error) {
+            console.error(error);
+            toast({
+                variant: "destructive",
+                title: "An error occurred.",
+                description: "Unable to edit."
+            });
+            refetch();
+        }
+        }, 500) // Adjust the debounce delay as needed (e.g., 500 milliseconds)
+    ).current;
+
 
     // todo: Fix this.
     const canEditBoard = useMemo(() => {
@@ -230,15 +248,17 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
             return { ...task, content };
         });
 
+        
         setTasks(newTasks);
 
-        try {
-            await thisBoard.editCardMutation.mutateAsync({cardId: id, data: {title: content}});
-        } catch (error) {
-            console.error(error);
-            toast({ variant: "destructive", title: "An error occured.", description: "Unable to edit." });
-            refetch();
-        }
+        debouncedUpdateTask(id ,content);
+        // try {
+        //     await thisBoard.editCardMutation.mutateAsync({cardId: id, data: {title: content}});
+        // } catch (error) {
+        //     console.error(error);
+        //     toast({ variant: "destructive", title: "An error occured.", description: "Unable to edit." });
+        //     refetch();
+        // }
     }
 
     async function createNewColumn() {
