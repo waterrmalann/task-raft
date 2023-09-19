@@ -95,9 +95,9 @@ function TaskCard({ task, deleteTask, updateTask }: Props) {
                 setMouseIsOver(false);
             }}
         >
-            <p className="my-auto h-[99%] w-full overflow-y-auto overflow-x-hidden whitespace-pre-wrap select-none">
+            <div className="my-auto h-[99%] w-full overflow-y-auto overflow-x-hidden whitespace-pre-wrap select-none">
              {task?.label && <Badge>{task.label}</Badge>} {task.content}
-            </p>
+            </div>
 
             {mouseIsOver && (
                 <>
