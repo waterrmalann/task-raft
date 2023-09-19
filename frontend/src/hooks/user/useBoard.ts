@@ -214,6 +214,10 @@ const useBoard = (boardId: string) => {
                 throw new Error(res.message);
             }
             return res;
+        }, {
+            onSuccess: () => {
+                queryClient.invalidateQueries(queryKey);
+            }
         }
     );
 
@@ -227,6 +231,10 @@ const useBoard = (boardId: string) => {
                 throw new Error(data.message);
             }
             return data;
+        }, {
+            onSuccess: () => {
+                queryClient.invalidateQueries(queryKey);
+            }
         }
     );
 
@@ -302,6 +310,10 @@ const useBoard = (boardId: string) => {
                 throw new Error(data.message);
             }
             return data;
+        }, {
+            onSuccess: () => {
+                queryClient.invalidateQueries(queryKey);
+            }
         }
     );
 
