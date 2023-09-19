@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RxTrash } from 'react-icons/rx'; // RxPencil2
 import {AiOutlineTags} from 'react-icons/ai';
 import { Id, Task } from "./KanbanBoard";
@@ -11,12 +11,18 @@ import { Badge } from "@/components/ui/badge"
 interface Props {
     task: Task;
     deleteTask: (id: Id) => Promise<void>;
-    updateTask: (id: Id, content: string) => Promise<void>;
+    updateTask: (id: Id, content: string, label?: string) => Promise<void>;
 }
 
 function TaskCard({ task, deleteTask, updateTask }: Props) {
     const [mouseIsOver, setMouseIsOver] = useState(false);
     const [editMode, setEditMode] = useState(true);
+
+    const [labelText, setLabelText] = useState<string | undefined>(task.label);
+    useEffect(() => {
+        updateTask(task.id, task.content, labelText);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [labelText])
 
     const {
         setNodeRef,
@@ -106,7 +112,7 @@ function TaskCard({ task, deleteTask, updateTask }: Props) {
                     >
                         <RxPencil2 />
                     </button> */}
-                    <AddLabelPopover>
+                    <AddLabelPopover labelText={labelText} setLabelText={setLabelText}>
                         <button className="stroke-white absolute right-10 top-1/2 -translate-y-1/2 bg-columnBackgroundColor p-2 rounded opacity-60 hover:opacity-100">
                             <AiOutlineTags size={20} />
                         </button>

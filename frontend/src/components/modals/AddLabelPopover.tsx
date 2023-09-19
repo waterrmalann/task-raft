@@ -9,9 +9,12 @@ import {
 
 interface AddLabelPopoverModal extends React.HTMLAttributes<HTMLDivElement> {
     children: React.ReactNode;
+    labelText: undefined | string;
+    setLabelText: React.Dispatch<React.SetStateAction<undefined | string>>;
 }
 
-export function AddLabelPopover({ children }: AddLabelPopoverModal) {
+export function AddLabelPopover({ children, labelText, setLabelText }: AddLabelPopoverModal) {
+    
     return (
         <Popover>
             <PopoverTrigger asChild>
@@ -30,8 +33,9 @@ export function AddLabelPopover({ children }: AddLabelPopoverModal) {
                             <Label htmlFor="label">Label</Label>
                             <Input
                                 id="label"
-                                defaultValue=""
                                 className="col-span-2 h-8"
+                                value={labelText}
+                                onChange={e => setLabelText(e.target.value)}
                             />
                         </div>
                     </div>

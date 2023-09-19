@@ -77,8 +77,9 @@ interface AddCardParams {
 interface EditCardParams {
     cardId: Id;
     data: {
-        title: string;
+        title?: string;
         description?: string;
+        label?: string;
     }
 }
 

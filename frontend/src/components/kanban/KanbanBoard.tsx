@@ -64,20 +64,19 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
 
     const taskRef = useRef<{from: Task | null, to: Task | number | null}>({from: null, to: null});
     const debouncedUpdateTask = useRef(
-        debounce(async (id: Id, content: string) => {
-            console.log(`Updated: ${content}`);
-        try {
-            await thisBoard.editCardMutation.mutateAsync({ cardId: id, data: { title: content } });
-        } catch (error) {
-            console.error(error);
-            toast({
-                variant: "destructive",
-                title: "An error occurred.",
-                description: "Unable to edit."
-            });
-            refetch();
-        }
-        }, 500) // Adjust the debounce delay as needed (e.g., 500 milliseconds)
+        debounce(async (id: Id, content: string, label?: string) => {
+            try {
+                await thisBoard.editCardMutation.mutateAsync({ cardId: id, data: { title: content, label: label } });
+            } catch (error) {
+                console.error(error);
+                toast({
+                    variant: "destructive",
+                    title: "An error occurred.",
+                    description: "Unable to edit."
+                });
+                refetch();
+            }
+        }, 500)
     ).current;
 
 
@@ -229,6 +228,8 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
     }
 
     async function deleteTask(id: Id) {
+        debouncedUpdateTask.cancel();
+        
         const newTasks = tasks.filter((task) => task.id !== id);
         setTasks(newTasks);
 
@@ -242,16 +243,16 @@ function KanbanBoard({ boardId }: KanbanBoardProps) {
 
     }
 
-    async function updateTask(id: Id, content: string) {
+    async function updateTask(id: Id, content: string, label?: string) {
         const newTasks = tasks.map((task) => {
             if (task.id !== id) return task;
-            return { ...task, content };
+            return { ...task, content, label };
         });
 
         
         setTasks(newTasks);
 
-        debouncedUpdateTask(id ,content);
+        debouncedUpdateTask(id ,content, label);
         // try {
         //     await thisBoard.editCardMutation.mutateAsync({cardId: id, data: {title: content}});
         // } catch (error) {
