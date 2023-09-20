@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 
+var domain;
 var transporter;
 export default function setupMailer() {
     transporter = nodemailer.createTransport({
@@ -11,14 +12,16 @@ export default function setupMailer() {
             pass: process.env.MAIL_PASSWORD
         }
     });
+
+    domain = process.env.DOMAIN || 'http://localhost:3000';
 }
 
 export function getVerificationLink(userId, code) {
-    return `http://localhost:3000/verify/${code}?uid=${userId}`;
+    return `${domain}/verify/${code}?uid=${userId}`;
 }
 
 export function getInviteLink(boardId) {
-    return `http://localhost:3000/dash/boards/${boardId}/invite`;
+    return `${domain}/dash/boards/${boardId}/invite`;
 }
 
 // Function to send OTP email
